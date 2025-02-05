@@ -1,22 +1,30 @@
 from flask import Flask
-from flask_restful import Api, Resource, reqparse
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-from dotenv import load_dotenv
+from flask_cors import CORS
+from flask_restful import Api
 import os
+from configs import db, app, api
 
-load_dotenv()
 
-app = Flask(__name__)
-api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-db = SQLAlchemy(app)
 
-class UserModel(db.Model):
-  id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-  email = db.Column(db.String(100), nullable=False, unique=True)
-  name = db.Column(db.String(100), nullable=False)
-  created_at = db.Column(db.DateTime, default=datetime.now())
+# Models / Database Tables
+from Models.classroom_model import Classroom
+from Models.user_model import User
+
+
+
+# Controllers
+from Controllers.RegisterResource import RegisterResource
+api.add_resource(RegisterResource, '/register')
+
+from Controllers.SessionResource import SessionResource
+api.add_resource(SessionResource, '/login')
+
+from Controllers.ClassroomResource import ClassroomResource
+api.add_resource(ClassroomResource, '/classroom')
+
+
+
+
 
 if __name__ == "__main__":
-  app.run(debug=True)
+    app.run(debug=True)

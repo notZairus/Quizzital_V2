@@ -1,24 +1,109 @@
+import { lazy, useState, useContext } from "react";
+import { Link } from "react-router-dom";
+import { auth, googleProvider } from "../configs/firebase";
+import { signInWithPopup } from "firebase/auth";
+import { baseUrl } from "../js/functions";
+import Swal from "sweetalert2";
+import { AuthContext } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+
+const Register = lazy(() => import('./Register'))
+
 
 export default function Login() {
+  const { login } = useContext(AuthContext);
+  const [formData, setFormData] = useState({
+    'email': '',
+    'password': ''
+  })
+  const navigate = useNavigate()
+
+
+  async function googleSignIn() {
+    let result = await signInWithPopup(auth, googleProvider);
+
+    let data = {
+      first_name: result.user.displayName.split(" ")[0],
+      last_name: result.user.displayName.split(" ")[1],
+      email: result.user.email
+    }
+
+    let response = await fetch(baseUrl("/register"), {
+      method: "POST",
+      headers: {
+        'Content-type' : 'application/json'
+      },
+      body: JSON.stringify({
+        ...data,
+        provider: 'google'
+      }),
+    })
+  }
+
+  async function signIn(e) {
+    e.preventDefault();
+
+    let res = await fetch('http://127.0.0.1:5000/login', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        ...formData, 
+        provider: 'email'
+      })
+    })
+
+    if (res.status == 404) {
+      Swal.fire({
+        icon: 'error',
+        title: 'User not found.',
+        text: 'User with this email doesn\'t exist'
+      })
+    }
+
+    let user = await res.json();
+
+    if (user && user.password === formData.password) {
+      Swal.fire({
+        'icon': 'success',
+        'title': 'Login Successfully!',
+      }) 
+      login(user);
+      navigate('/');
+    } else {
+      Swal.fire({
+        'icon': 'error',
+        'title': 'Incorrect Password!',
+      })
+    }
+
+    setFormData({
+      'email': '',
+      'password': ''
+    })
+  }
+
+  
   return (
     <>
       <div class="max-w-lg mx-auto my-16 bg-white p-8 rounded-xl shadow-slate-300 shadow-md">
           <h1 class="text-4xl font-medium text-center">Login</h1>
   
           <div class="my-5">
-              <button class="w-full text-center py-3 my-3 border flex space-x-2 items-center justify-center border-slate-200 rounded-lg text-slate-700 hover:border-slate-400 hover:text-slate-900 hover:shadow transition duration-150">
+              <button onClick={googleSignIn} class="w-full text-center py-3 my-3 border flex space-x-2 items-center justify-center border-slate-200 rounded-lg text-slate-700 hover:border-slate-400 hover:text-slate-900 hover:shadow transition duration-150">
                   <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-6 h-6" alt="" /> <span>Login with Google</span>
               </button>
           </div>
-          <form action="" class="my-10">
+          <form onSubmit={signIn} class="my-10">
               <div class="flex flex-col space-y-5">
                   <label for="email">
                       <p class="font-medium text-slate-700 pb-2">Email address</p>
-                      <input id="email" name="email" type="email" class="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter email address" />
+                      <input required value={formData.email} onChange={(e) => setFormData(prev => ({...prev, 'email': e.target.value}))} id="email" name="email" type="email" class="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter email address" />
                   </label>
                   <label for="password">
                       <p class="font-medium text-slate-700 pb-2">Password</p>
-                      <input id="password" name="password" type="password" class="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter your password" />
+                      <input required value={formData.password} onChange={(e) => setFormData(prev => ({...prev, 'password': e.target.value}))} id="password" name="password" type="password" class="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter your password" />
                   </label>
                   <button class="w-full py-3 font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg border-indigo-500 hover:shadow inline-flex space-x-2 items-center justify-center">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -26,9 +111,9 @@ export default function Login() {
                         </svg>
                         <span>Login</span>
                   </button>
-                  <p class="text-center">Not registered yet? <a href="#" class="text-indigo-600 font-medium inline-flex space-x-1 items-center"><span>Register now </span><span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <p class="text-center">Not registered yet? <Link to="/register" element={<Register />} class="text-indigo-600 font-medium inline-flex space-x-1 items-center"><span>Register now </span><span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg></span></a></p>
+                    </svg></span></Link></p>
               </div>
           </form>
       </div>
