@@ -28,7 +28,7 @@ export default function Login() {
       email: result.user.email
     }
 
-    let response = await fetch(baseUrl("/register"), {
+    let response = await fetch(baseUrl("/login"), {
       method: "POST",
       headers: {
         'Content-type' : 'application/json'
@@ -38,6 +38,20 @@ export default function Login() {
         provider: 'google'
       }),
     })
+
+    if (response.status == 403) {
+      Swal.fire({
+        icon:"error",
+        title: 'Forbidden.',
+        text: 'The user is not registered using the selected provider.'
+      })
+      return;
+    }
+
+    let user = await response.json()
+
+    login(user);
+    navigate('/classrooms')
   }
 
   async function signIn(e) {
@@ -54,12 +68,18 @@ export default function Login() {
       })
     })
 
+    setFormData({
+      'email': '',
+      'password': ''
+    })
+
     if (res.status == 404) {
       Swal.fire({
         icon: 'error',
         title: 'User not found.',
         text: 'User with this email doesn\'t exist'
       })
+      return;
     }
 
     let user = await res.json();
@@ -76,12 +96,8 @@ export default function Login() {
         'icon': 'error',
         'title': 'Incorrect Password!',
       })
+      return;
     }
-
-    setFormData({
-      'email': '',
-      'password': ''
-    })
   }
 
   

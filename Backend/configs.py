@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
 
-load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 api = Api(app)
