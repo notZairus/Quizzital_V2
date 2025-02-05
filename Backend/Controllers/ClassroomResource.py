@@ -1,5 +1,5 @@
 from flask_restful import Resource, abort, marshal, fields
-from flask import jsonify
+from flask import jsonify, request
 from pydantic import BaseModel, Field, ValidationError
 from Models.classroom_model import Classroom
 
@@ -20,12 +20,17 @@ class create_classroom_validator(BaseModel):
   classroom_key: str
 
 
-class ClassroomResource(Resource):
-  def get(self): #get all classrooms
+class getClassroomResource(Resource):
+  def post(self): # get all the classrooms based on the user id
     try:
-      classrooms = Classroom.query.all()
+      data = request.get_json()
+      validated_data = get_owned_classroom_validator(**data).model_dump()
+      classrooms = Classroom.query.filter_by(user_id = validated_data['user_id']).all();
       return marshal(classrooms, classroom_fields)
     except ValidationError as e:
-      return e.errors()
+      return jsonify({
+        'message': e.errors()
+      })
+
   
   

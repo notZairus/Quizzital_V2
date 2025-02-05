@@ -19,8 +19,8 @@ api.add_resource(RegisterResource, '/register')
 from Controllers.SessionResource import SessionResource
 api.add_resource(SessionResource, '/login')
 
-from Controllers.ClassroomResource import ClassroomResource
-api.add_resource(ClassroomResource, '/classroom')
+from Controllers.ClassroomResource import getClassroomResource
+api.add_resource(getClassroomResource, '/get_classrooms')
 
 
 
