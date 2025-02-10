@@ -13,6 +13,7 @@ user_fields = {
   'password': fields.String,
   'first_name': fields.String,
   'last_name': fields.String,
+  'role': fields.String,
   'created_at': fields.String,
 }
 

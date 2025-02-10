@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from '../contexts/AuthContext.jsx';
-import { baseUrl } from "../js/functions.js";
+import { backendUrl } from "../js/functions.js";
 import Heading1 from "./Heading1.jsx"
 import Swal from "sweetalert2";
 import { nanoid } from 'nanoid';
@@ -13,7 +13,7 @@ export default function Classrooms() {
 
   useEffect(() => {
     const getClassrooms = async () => {
-      let response = await fetch(baseUrl('/get_classrooms'), {
+      let response = await fetch(backendUrl('/get_classrooms'), {
         method: 'POST',
         headers: {
           'Content-type': 'application/json'
@@ -43,7 +43,7 @@ export default function Classrooms() {
         rgba(0,0,0,0.2)
       `,
       preConfirm: async (value) => {
-        let res = await fetch(baseUrl('/classroom'), {
+        let res = await fetch(backendUrl('/classroom'), {
           method: 'POST',
           headers: {
             'Content-type': 'application/json',

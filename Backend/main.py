@@ -27,5 +27,23 @@ api.add_resource(ClassroomResource, '/classroom')
 
 
 
+@app.route('/user-role', methods=['PATCH'])
+def get_role():
+    data = request.get_json()
+    
+    if ('user_id' not in data) or ("role" not in data):
+        return jsonify({
+            'message': 'user_id or role property is required'
+        }), 400
+    
+    user = User.query.filter_by(id=data['user_id']).first()
+    user.role = data['role']
+    db.session.commit()
+
+    return jsonify(user.get_json())
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)

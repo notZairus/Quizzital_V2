@@ -2,20 +2,22 @@ import { lazy, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { auth, googleProvider } from "../configs/firebase";
 import { signInWithPopup } from "firebase/auth";
-import { baseUrl } from "../js/functions";
+import { backendUrl } from "../js/functions";
 import Swal from "sweetalert2";
 import { AuthContext } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const Register = lazy(() => import('./Register'))
+const UserRoles = lazy(() => import('./UserRoles'))
+
 
 export default function Login() {
+  const navigate = useNavigate()
   const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     'email': '',
     'password': ''
   })
-  const navigate = useNavigate()
 
 
   async function googleSignIn() {
@@ -27,7 +29,7 @@ export default function Login() {
       email: result.user.email
     }
 
-    let response = await fetch(baseUrl("/login"), {
+    let response = await fetch(backendUrl("/login"), {
       method: "POST",
       headers: {
         'Content-type' : 'application/json'
@@ -50,6 +52,12 @@ export default function Login() {
     let user = await response.json()
 
     login(user);
+
+    if (!user.role) {
+      navigate('/user-roles')
+      return;
+    }
+
     navigate('/classrooms');
   }
 
@@ -88,7 +96,14 @@ export default function Login() {
         'icon': 'success',
         'title': 'Login Successfully!',
       }) 
+
       login(user);
+      
+      if (!user.role) {
+        navigate('/user-roles')
+        return;
+      }
+
       navigate('/classrooms');
     } else {
       Swal.fire({

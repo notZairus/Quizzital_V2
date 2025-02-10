@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Validator } from '../js/Classes'
 import Swal from "sweetalert2";
-import { baseUrl } from "../js/functions"
+import { backendUrl } from "../js/functions"
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     'first_name': "",
     'last_name': "",
@@ -41,7 +43,7 @@ export default function Register() {
   
     if (Object.keys(newErrors).length != 0) return;
     
-    let res = await fetch(baseUrl('/register'), {
+    let res = await fetch(backendUrl('/register'), {
       method: 'POST',
       headers: {
         "Content-Type": 'application/json'
@@ -71,6 +73,7 @@ export default function Register() {
 
     let newUser = await res.json();
     console.log(newUser);
+    navigate('/login')
   }
   
 
