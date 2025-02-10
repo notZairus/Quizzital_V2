@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_restful import Api
 import os
@@ -22,7 +22,8 @@ api.add_resource(SessionResource, '/login')
 from Controllers.ClassroomResource import getClassroomResource
 api.add_resource(getClassroomResource, '/get_classrooms')
 
-
+from Controllers.ClassroomResource import ClassroomResource
+api.add_resource(ClassroomResource, '/classroom')
 
 
 

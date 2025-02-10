@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 
 const Register = lazy(() => import('./Register'))
 
-
 export default function Login() {
   const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({
@@ -51,7 +50,7 @@ export default function Login() {
     let user = await response.json()
 
     login(user);
-    navigate('/classrooms')
+    navigate('/classrooms');
   }
 
   async function signIn(e) {
@@ -90,7 +89,7 @@ export default function Login() {
         'title': 'Login Successfully!',
       }) 
       login(user);
-      navigate('/');
+      navigate('/classrooms');
     } else {
       Swal.fire({
         'icon': 'error',
