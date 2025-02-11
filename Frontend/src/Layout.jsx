@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Outlet,  useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "./contexts/AuthContext";
+
 import burger_icon from './assets/icons/burger-icon.svg';
 import cross_icon from './assets/icons/cross-svgrepo-com.svg'
 import school_icon from "./assets/icons/school-svgrepo-com (white).svg"
@@ -11,8 +14,14 @@ import acc_settings_gray from './assets/icons/settings-svgrepo-com (gray).svg'
 
 
 export default function Layout() {
-  const [sideExpanded, setSideExpanded] = useState(false);
   const navigate = useNavigate();
+  const [sideExpanded, setSideExpanded] = useState(false);
+  const { logout } = useContext(AuthContext)
+
+  function handleLogout() {
+    logout();
+    navigate('/login')
+  }
 
   return (
     <>  
@@ -31,7 +40,7 @@ export default function Layout() {
         </header>
         
         <div className="flex h-full">
-          <div className={`${sideExpanded ? "w-80 " : 'w-0'} pt-20 h-full shadow bg-white transition-all duration-500 overflow-hidden absolute left-0`}>
+          <div className={`${sideExpanded ? "w-80 " : 'w-0'} pb-4 flex flex-col justify-between pt-20 h-full shadow bg-white transition-all duration-500 overflow-hidden absolute left-0`}>
             <nav>
               <div onClick={() => navigate('/classrooms')}>
                 <div className={`${window.location.pathname == '/classrooms' ? 'text-white bg-BackgroundColor_Darker' : 'text-gray-300'} transition-all duration-300 flex items-center font-semibold gap-4 text-2xl px-8 py-6`}>
@@ -60,6 +69,9 @@ export default function Layout() {
                 </div>
               </div>
             </nav>
+            <div className="flex justify-center items-center">
+              <button onClick={handleLogout} className="bg-BackgroundColor_Darker rounded px-4 py-2 text-white text-2xl hover:bg-red-500">Logout</button>
+            </div>
           </div>
   
           <div className="flex-1 pt-28 px-16 pb-12">

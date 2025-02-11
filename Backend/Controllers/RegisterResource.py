@@ -1,20 +1,9 @@
-from flask import request
-from flask_restful import Resource, marshal, fields, abort
+from flask import request, jsonify
+from flask_restful import Resource, abort
 from pydantic import BaseModel, Field, ValidationError
 from configs import db
 from Models.user_model import User
 from typing import Optional
-
-# this is for marshal_with
-user_fields = {
-  'id': fields.Integer,
-  'email': fields.String,
-  'provider': fields.String,
-  'password': fields.String,
-  'first_name': fields.String,
-  'last_name': fields.String,
-  'created_at': fields.String,
-}
 
 #this is for validation
 class create_user_validator(BaseModel):
@@ -39,7 +28,7 @@ class RegisterResource(Resource):
       new_user = User(**validatedData)
       db.session.add(new_user)
       db.session.commit()
-      return marshal(new_user, user_fields)
+      return jsonify(new_user.get_json())
     
     except ValidationError as e:
       return {'errors': e.errors()}

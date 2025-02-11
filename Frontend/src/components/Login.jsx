@@ -51,6 +51,8 @@ export default function Login() {
 
     let user = await response.json()
 
+    console.log(user)
+
     login(user);
 
     if (!user.role) {

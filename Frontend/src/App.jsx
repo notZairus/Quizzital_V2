@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useContext } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthContext } from './contexts/AuthContext.jsx';
 
 const Layout = lazy(() => import('./Layout.jsx'));
 const Login = lazy(() => import('./Components/Login.jsx'));

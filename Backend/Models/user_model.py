@@ -1,5 +1,6 @@
 from datetime import datetime
 from configs import db
+from .classroom_user_tbl import classroom_user_tbl
 
 class User(db.Model):
   id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
@@ -10,6 +11,7 @@ class User(db.Model):
   last_name = db.Column(db.String(50), nullable=False)
   role = db.Column(db.String(20))
   created_at = db.Column(db.DateTime, default=datetime.now())
+  classrooms = db.relationship('Classroom', secondary=classroom_user_tbl, back_populates='users')
 
   def __repr__(self):
     return f"User(email={self.email}, password={self.password}, first_name={self.first_name},last_name={self.last_name})"
@@ -23,5 +25,5 @@ class User(db.Model):
       "first_name": self.first_name,
       "last_name": self.last_name,
       "role": self.role,
-      "created_at": self.created_at
+      "created_at": self.created_at,
     }
