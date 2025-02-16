@@ -60,7 +60,7 @@ export default function Login() {
       return;
     }
 
-    navigate('/classrooms');
+    navigate('/classroom');
   }
 
   async function signIn(e) {
@@ -106,7 +106,7 @@ export default function Login() {
         return;
       }
 
-      navigate('/classrooms');
+      navigate('/classroom');
     } else {
       Swal.fire({
         'icon': 'error',

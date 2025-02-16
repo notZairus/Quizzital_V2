@@ -1,11 +1,9 @@
 import { useContext, lazy, Suspense } from "react";
-import { AuthContext } from '../contexts/AuthContext.jsx';
-import Heading1 from "./Heading1.jsx"
+import { AuthContext } from '../../contexts/AuthContext.jsx';
+import Heading1 from "../../Components/Heading1.jsx"
 
 const ProfessorClassroom = lazy(() => import('./ProfessorClassroom.jsx'))
 const StudentClassroom = lazy(() => import('./StudentClassroom.jsx'))
-
-
 
 
 export default function Classrooms() {
@@ -14,6 +12,7 @@ export default function Classrooms() {
   return (
     <>
       <Heading1>Classrooms</Heading1>
+      <Heading1>{currentUser.role}</Heading1>
         <Suspense>
           {currentUser.role === 'professor' 
             ? <ProfessorClassroom />

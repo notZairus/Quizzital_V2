@@ -42,19 +42,19 @@ export default function Layout() {
         <div className="flex h-full">
           <div className={`${sideExpanded ? "w-80 " : 'w-0'} pb-4 flex flex-col justify-between pt-20 h-full shadow bg-white transition-all duration-500 overflow-hidden absolute left-0`}>
             <nav>
-              <div onClick={() => navigate('/classrooms')}>
-                <div className={`${window.location.pathname == '/classrooms' ? 'text-white bg-BackgroundColor_Darker' : 'text-gray-300'} transition-all duration-300 flex items-center font-semibold gap-4 text-2xl px-8 py-6`}>
+              <div onClick={() => navigate('/classroom')}>
+                <div className={`${window.location.pathname.startsWith('/classroom') ? 'text-white bg-BackgroundColor_Darker' : 'text-gray-300'} transition-all duration-300 flex items-center font-semibold gap-4 text-2xl px-8 py-6`}>
                   <div className="w-8">
-                    <img src={window.location.pathname == '/classrooms' ? school_icon : school_icon_gray} />
+                    <img src={window.location.pathname.startsWith('/classroom') ? school_icon : school_icon_gray} />
                   </div>
                   Classrooms
                 </div>
               </div>
   
-              <div onClick={() => navigate('/quizzes')}>
-                <div className={`${window.location.pathname == '/quizzes' ? 'text-white bg-BackgroundColor_Darker' : 'text-gray-300'} transition-all duration-300 flex items-center font-semibold gap-4 text-2xl px-8 py-6`}>
+              <div onClick={() => navigate('/quiz')}>
+                <div className={`${window.location.pathname.startsWith('/quiz') ? 'text-white bg-BackgroundColor_Darker' : 'text-gray-300'} transition-all duration-300 flex items-center font-semibold gap-4 text-2xl px-8 py-6`}>
                       <div className="w-8">
-                        <img src={window.location.pathname == '/quizzes' ? quizzes_icon : quizzes_icon_gray} />
+                        <img src={window.location.pathname.startsWith('/quiz') ? quizzes_icon : quizzes_icon_gray} />
                       </div>
                   Quizzes
                 </div>

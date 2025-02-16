@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
-import { AuthContext } from '../contexts/AuthContext.jsx';
-import { backendUrl } from "../js/functions.js";
+import { AuthContext } from '../../contexts/AuthContext.jsx';
+import { backendUrl } from "../../js/functions.js";
 import Swal from "sweetalert2";
 import { nanoid } from 'nanoid';
 

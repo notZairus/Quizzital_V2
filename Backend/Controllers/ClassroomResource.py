@@ -1,6 +1,6 @@
 from flask_restful import Resource, abort, marshal, fields
 from flask import jsonify, request
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ValidationError
 from Models.classroom_model import Classroom
 from Models.user_model import User
 from configs import db

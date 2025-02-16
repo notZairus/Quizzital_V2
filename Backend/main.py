@@ -9,10 +9,12 @@ from configs import db, app, api
 # Models / Database Tables
 from Models.classroom_model import Classroom
 from Models.user_model import User
+from Models.quiz_model import Quiz
+from Models.question_model import Question
 
 
 
-# Controllers
+# Controllers/Resource
 from Controllers.RegisterResource import RegisterResource
 api.add_resource(RegisterResource, '/register')
 
@@ -24,6 +26,12 @@ api.add_resource(getClassroomResource, '/get_classrooms')
 
 from Controllers.ClassroomResource import ClassroomResource
 api.add_resource(ClassroomResource, '/classroom')
+
+from Controllers.QuizResource import QuizResource
+api.add_resource(QuizResource, '/quiz')
+
+from Controllers.QuestionResource import QuestionResource
+api.add_resource(QuestionResource, '/question')
 
 
 

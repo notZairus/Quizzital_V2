@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../contexts/AuthContext";
-import { backendUrl } from "../js/functions";
+import { AuthContext } from "../../contexts/AuthContext";
+import { backendUrl } from "../../js/functions";
 import Swal from "sweetalert2";
 
 export default function StudentClassroom() {
