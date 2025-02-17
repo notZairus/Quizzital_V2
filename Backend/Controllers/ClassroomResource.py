@@ -54,7 +54,7 @@ class ClassroomResource(Resource):
       validated_data = add_classroom_validator(**data).model_dump()
 
       if (validated_data['role'] == 'professor'):
-        new_classroom = Classroom(**validated_data)
+        new_classroom = Classroom(user_id=validated_data['user_id'], name=validated_data['name'], classroom_key=validated_data['classroom_key'])
         db.session.add(new_classroom)
         db.session.commit()
         return marshal(new_classroom, classroom_fields)

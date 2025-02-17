@@ -84,12 +84,12 @@ export default function StudentClassroom() {
     <div className="w-full grid grid-cols-5 gap-4 mt-8 auto-rows-min">
       {
         classrooms.map((classroom, index) => (
-          <div key={index} className="bg-white rounded shadow p-4 flex items-center justify-center text-3xl h-[150px]">
+          <div key={index} className="bg-white rounded-3xl shadow p-4 flex items-center justify-center text-3xl h-64">
             {classroom.name}
           </div>
         ))
       }
-      <div onClick={joinRoom} className="h-[150px] p-4 flex hover:bg-black/15 transition-all duration-200 items-center justify-center text-3xl cursor-pointer bg-black/10 text-black/50 rounded-lg">
+      <div onClick={joinRoom} className="h-64 p-4 flex hover:bg-black/15 transition-all duration-200 items-center justify-center text-3xl cursor-pointer bg-black/10 text-black/50 rounded-3xl">
         + Join Room
       </div>
     </div>

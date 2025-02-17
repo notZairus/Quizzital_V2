@@ -8,12 +8,15 @@ from configs import db
 
 class create_question_validator(BaseModel):
   quiz_id: int
+  question: str
   type: str
   choices: Optional[List[str]] = None
   answer: str
 
 
 class QuestionResource(Resource):
+
+  # add question on the database
   def post(self):
     try:
       data = request.get_json()
@@ -24,4 +27,5 @@ class QuestionResource(Resource):
       return jsonify(new_question.to_json())
     
     except ValidationError as e:
+      print({ 'message ': e.errors() })
       return { 'message ': e.errors() }

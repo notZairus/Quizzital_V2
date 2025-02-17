@@ -9,7 +9,7 @@ from configs import db
 class create_quiz_validator(BaseModel):
   user_id: int
   name: str
-  total_points: int
+  number_of_questions: int
 
 
 class QuizResource(Resource):
@@ -23,6 +23,5 @@ class QuizResource(Resource):
       return jsonify(new_quiz.to_json())
       
     except ValidationError as e:
-      return {
-        "message": e.errors()
-      }
+      print({ 'message': e.errors() })
+      abort(404, message=e.errors())

@@ -12,7 +12,6 @@ export default function Classrooms() {
   return (
     <>
       <Heading1>Classrooms</Heading1>
-      <Heading1>{currentUser.role}</Heading1>
         <Suspense>
           {currentUser.role === 'professor' 
             ? <ProfessorClassroom />

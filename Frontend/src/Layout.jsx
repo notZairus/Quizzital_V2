@@ -16,7 +16,7 @@ import acc_settings_gray from './assets/icons/settings-svgrepo-com (gray).svg'
 export default function Layout() {
   const navigate = useNavigate();
   const [sideExpanded, setSideExpanded] = useState(false);
-  const { logout } = useContext(AuthContext)
+  const { logout, currentUser } = useContext(AuthContext)
 
   function handleLogout() {
     logout();
@@ -51,21 +51,21 @@ export default function Layout() {
                 </div>
               </div>
   
-              <div onClick={() => navigate('/quiz')}>
+              {currentUser.role === 'professor' && <div onClick={() => navigate('/quiz')}>
                 <div className={`${window.location.pathname.startsWith('/quiz') ? 'text-white bg-BackgroundColor_Darker' : 'text-gray-300'} transition-all duration-300 flex items-center font-semibold gap-4 text-2xl px-8 py-6`}>
                       <div className="w-8">
                         <img src={window.location.pathname.startsWith('/quiz') ? quizzes_icon : quizzes_icon_gray} />
                       </div>
                   Quizzes
                 </div>
-              </div>
+              </div>}
   
-              <div onClick={() => navigate('/account-settings')}>
-                <div className={`${window.location.pathname == '/account-settings' ? 'text-white bg-BackgroundColor_Darker' : 'text-gray-300'} transition-all duration-300 flex items-center font-semibold gap-4 text-2xl px-8 py-6`}>
+              <div onClick={() => navigate('/ai')}>
+                <div className={`${window.location.pathname == '/ai' ? 'text-white bg-BackgroundColor_Darker' : 'text-gray-300'} transition-all duration-300 flex items-center font-semibold gap-4 text-2xl px-8 py-6`}>
                   <div className="w-8">
-                    <img src={window.location.pathname == '/account-settings' ? acc_settings : acc_settings_gray} />
+                    <img src={window.location.pathname == '/ai' ? acc_settings : acc_settings_gray} />
                   </div>
-                  Account Settings
+                  Ai Quiz Maker
                 </div>
               </div>
             </nav>

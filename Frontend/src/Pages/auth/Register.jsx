@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Validator } from '../js/Classes'
+import { Validator } from '../../js/Classes'
 import Swal from "sweetalert2";
-import { backendUrl } from "../js/functions"
+import { backendUrl } from "../../js/functions"
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {

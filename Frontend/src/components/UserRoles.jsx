@@ -25,7 +25,7 @@ export default function UserRoles() {
     logout()
     login(updatedUser)
     console.log(updatedUser)
-    navigate('/classrooms')
+    navigate('/classroom')
   }
 
   return (
