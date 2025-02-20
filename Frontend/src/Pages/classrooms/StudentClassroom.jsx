@@ -81,7 +81,7 @@ export default function StudentClassroom() {
 
 
   return (
-    <div className="w-full grid grid-cols-5 gap-4 mt-8 auto-rows-min">
+    <div className="w-full grid grid-cols-5 gap-4 auto-rows-min">
       {
         classrooms.map((classroom, index) => (
           <div key={index} className="bg-white rounded-3xl shadow p-4 flex items-center justify-center text-3xl h-64">

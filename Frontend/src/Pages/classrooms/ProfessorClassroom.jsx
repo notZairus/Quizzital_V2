@@ -62,10 +62,10 @@ export default function ProfessorClassroom() {
   }
 
   return (
-    <div className="w-full grid grid-cols-3 gap-8 mt-8 auto-rows-min">
+    <div className="w-full grid grid-cols-3 gap-8 auto-rows-min">
       {
         classrooms.map(classroom => (
-          <div key={classroom.classroom_key} className="bg-white rounded-3xl shadow p-4 flex items-center justify-center text-3xl h-64">
+          <div key={classroom.classroom_key} className="bg-white rounded-3xl  border p-4 flex items-center justify-center text-3xl h-64">
             {classroom.name}
           </div>
         ))

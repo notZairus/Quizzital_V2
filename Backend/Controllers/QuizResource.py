@@ -25,3 +25,19 @@ class QuizResource(Resource):
     except ValidationError as e:
       print({ 'message': e.errors() })
       abort(404, message=e.errors())
+
+  def get(self):
+    user_id = request.args.get('user_id')
+
+    if user_id is not None:
+      quizzes = Quiz.query.filter_by(user_id = user_id);
+      quizzes_json = [];
+      for quiz in quizzes:
+        quizzes_json.append(quiz.to_json())
+      return jsonify(quizzes_json);
+  
+    quizzes = Quiz.query.all();
+    quizzes_json = [];
+    for quiz in quizzes:
+      quizzes_json.append(quiz.to_json())
+    return jsonify(quizzes_json);
