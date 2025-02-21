@@ -2,9 +2,11 @@ import { lazy, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { auth, googleProvider } from "../../configs/firebase";
 import { signInWithPopup } from "firebase/auth";
-import { backendUrl } from "../../js/functions.js"
+import { backendUrl, getClassroom, getQuizzes } from "../../js/functions.js"
 import Swal from "sweetalert2";
 import { AuthContext } from "../../contexts/AuthContext";
+import { ClassroomContext } from "../../contexts/ClassroomContext";
+import { QuizContext } from "../../contexts/QuizContext";
 import { useNavigate } from "react-router-dom";
 
 
@@ -14,10 +16,15 @@ const Register = lazy(() => import('./Register'))
 export default function Login() {
   const navigate = useNavigate()
   const { login } = useContext(AuthContext);
+  const { classrooms, insertClassroom } = useContext(ClassroomContext);
+  const { quizzes, insertQuiz } = useContext(QuizContext);
   const [formData, setFormData] = useState({
     'email': '',
     'password': ''
   })
+
+  console.log(classrooms);
+  console.log(quizzes);
 
 
   async function googleSignIn() {
@@ -57,6 +64,9 @@ export default function Login() {
       navigate('/user-roles')
       return;
     }
+
+    await getClassroom(user, insertClassroom);
+    await getQuizzes(user, insertQuiz);
 
     navigate('/classroom');
   }
@@ -104,7 +114,11 @@ export default function Login() {
         return;
       }
 
+      await getClassroom(user, insertClassroom);
+      await getQuizzes(user, insertQuiz);
+
       navigate('/classroom');
+      
     } else {
       Swal.fire({
         'icon': 'error',

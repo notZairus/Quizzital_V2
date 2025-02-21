@@ -20,6 +20,8 @@ export default function Layout() {
 
   function handleLogout() {
     logout();
+    localStorage.removeItem('quizzes');
+    localStorage.removeItem('classrooms');
     navigate('/login')
   }
 

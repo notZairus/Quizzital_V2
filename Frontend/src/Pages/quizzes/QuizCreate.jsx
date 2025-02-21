@@ -4,10 +4,14 @@ import { useContext, useRef, useState } from "react";
 import { backendUrl } from '../../js/functions';
 import ButtonLarge from '../../Components/ButtonLarge';
 import { AuthContext } from '../../contexts/AuthContext';
+import { QuizContext } from '../../contexts/QuizContext';
+import { useNavigate } from "react-router-dom";
 
 
 export default function QuizCreate() {
+  const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
+  const { quizzes, setQuizzes } = useContext(QuizContext);
   const [ multipleChoiceQuestions, setMultipleChoiceQuestions ] = useState([]);
   const [ idenficationQuestions, setIdenficationQuestions ] = useState([]);
   const quiz_name_ref = useRef(null);
@@ -120,15 +124,15 @@ export default function QuizCreate() {
       })
     })
 
+    setQuizzes([...quizzes, quiz]);
+
     Swal.fire({
       icon: 'success',
       title: 'Quiz Created',
       text: 'Quiz successfully created.'
     })
 
-    quiz_name_ref.current.value = "";
-    setMultipleChoiceQuestions([])
-    setIdenficationQuestions([])
+    navigate('/quiz');
   }
 
 

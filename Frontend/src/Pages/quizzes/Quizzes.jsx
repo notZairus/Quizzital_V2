@@ -1,26 +1,18 @@
 import Heading1 from "../../Components/Heading1";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
-import { backendUrl} from '../../js/functions.js';
+import { QuizContext } from "../../contexts/QuizContext";
 
 
 
 export default function Quizzes() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
-  const [quizzes, setQuizzes] = useState([]);
+  const { quizzes, setQuizzes } = useContext(QuizContext);
 
-  useEffect(() => {
-    const getQuiz = async () => {
-      let res = await fetch(backendUrl(`/quiz?user_id=${currentUser.id}`));
-      let quizzes = await res.json();
-      setQuizzes(quizzes);
-    }
+  console.log('ey oo')
 
-    getQuiz();
-  }, [])
-  
   return (
     <>
       <div className="flex items-start justify-between">
@@ -38,6 +30,7 @@ export default function Quizzes() {
         {
           quizzes.map(quiz => (
             <div 
+              key={quiz.id}
               className="w-full h-20 bg-white rounded border flex justify-between items-center px-8"
             >
               <p className=" "><span className="text-gray-400">ID:</span> <span className="font-semibold text-lg">{quiz.id}</span></p>

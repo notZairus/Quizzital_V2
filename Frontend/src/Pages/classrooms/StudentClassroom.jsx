@@ -1,35 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
+import { ClassroomContext } from "../../contexts/ClassroomContext";
 import { backendUrl } from "../../js/functions";
 import Swal from "sweetalert2";
 
 export default function StudentClassroom() {
     const { currentUser } = useContext(AuthContext);
-    const [classrooms, setClassrooms] = useState([]);
+    const { classrooms, setClassrooms } = useContext(ClassroomContext);
 
-    console.log(currentUser)
-    console.log(classrooms)
-
-    useEffect(() => {
-      const getClassrooms = async () => {
-        
-        let response = await fetch(backendUrl('/get_classrooms'), {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            user_id: currentUser.id,
-            role: currentUser.role
-          })
-        })
-  
-        let result = await response.json();
-        setClassrooms(result);
-      }
-
-      getClassrooms();
-    }, [])
 
     function joinRoom() {
       Swal.fire({
@@ -81,7 +59,7 @@ export default function StudentClassroom() {
 
 
   return (
-    <div className="w-full grid grid-cols-5 gap-4 auto-rows-min">
+    <div className="w-full grid grid-cols-3 gap-8 auto-rows-min">
       {
         classrooms.map((classroom, index) => (
           <div key={index} className="bg-white rounded-3xl shadow p-4 flex items-center justify-center text-3xl h-64">

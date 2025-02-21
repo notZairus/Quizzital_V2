@@ -1,32 +1,16 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from '../../contexts/AuthContext.jsx';
+import { ClassroomContext } from '../../contexts/ClassroomContext.jsx';
 import { backendUrl } from "../../js/functions.js";
 import Swal from "sweetalert2";
 import { nanoid } from 'nanoid';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProfessorClassroom() {
+  const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
-  const [classrooms, setClassrooms] = useState([]);
-
-  useEffect(() => {
-    const getClassrooms = async () => {
-      let response = await fetch(backendUrl('/get_classrooms'), {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify({
-          user_id: currentUser.id,
-          role: currentUser.role
-        })
-      })
-
-      let result = await response.json();
-      setClassrooms(result);
-    }
-    getClassrooms();
-  }, [])
-
+  const { classrooms, setClassrooms } = useContext(ClassroomContext);
+  
   function showAddClassroomForm() {
     Swal.fire({
       title: 'Classroom Name',
@@ -65,12 +49,12 @@ export default function ProfessorClassroom() {
     <div className="w-full grid grid-cols-3 gap-8 auto-rows-min">
       {
         classrooms.map(classroom => (
-          <div key={classroom.classroom_key} className="bg-white rounded-3xl  border p-4 flex items-center justify-center text-3xl h-64">
+          <div onClick={() => navigate(`/classroom/${classroom.id}`)} key={classroom.classroom_key} className="bg-white cursor-pointer rounded-3xl  border p-4 flex items-center justify-center text-3xl h-64">
             {classroom.name}
           </div>
         ))
       }
-      <div onClick={showAddClassroomForm} className="h-64 p-4 flex hover:bg-black/15 transition-all duration-200 items-center justify-center text-3xl cursor-pointer bg-black/10 text-black/50 rounded-3xl">
+      <div onClick={showAddClassroomForm} className=" h-64 p-4 flex hover:bg-black/15 transition-all duration-200 items-center justify-center text-3xl cursor-pointer bg-black/10 text-black/50 rounded-3xl">
         + New Room
       </div>
     </div>
