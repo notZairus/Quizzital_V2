@@ -6,7 +6,10 @@ import Swal from "sweetalert2";
 
 export default function StudentClassroom() {
     const { currentUser } = useContext(AuthContext);
-    const { classrooms, setClassrooms } = useContext(ClassroomContext);
+    const { classrooms, insertClassroom } = useContext(ClassroomContext);
+
+    console.log("classrooms: ")
+    console.log(classrooms);
 
 
     function joinRoom() {
@@ -52,7 +55,7 @@ export default function StudentClassroom() {
           }
 
           let result = await res.json()
-          setClassrooms(result)
+          insertClassroom(result)
         }
       });
     }

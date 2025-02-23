@@ -3,7 +3,7 @@ export function backendUrl(address) {
 }
 
 
-export async function getClassroom(user, setClassrooms) {
+export async function getClassroom(user, insertClassroom) {
   if (user.role === "professor") {
     let response = await fetch(backendUrl('/get_classrooms'), {
       method: 'POST',
@@ -17,7 +17,9 @@ export async function getClassroom(user, setClassrooms) {
     })
 
     let result = await response.json();
-    setClassrooms(result);
+    console.clear();
+    console.log(result);
+    insertClassroom(result);
   }
   else if (user.role === "student") {
     let response = await fetch(backendUrl('/get_classrooms'), {
@@ -32,17 +34,17 @@ export async function getClassroom(user, setClassrooms) {
     })
 
     let result = await response.json();
-    setClassrooms(result);
+    insertClassroom(result);
   }
 }
 
-export async function getQuizzes(user, setQuizzes) {
+export async function getQuizzes(user, insertQuizzes) {
   if (user.role === "professor") {
     let res = await fetch(backendUrl(`/quiz?user_id=${user.id}`));
     let quizzes = await res.json();
-    setQuizzes(quizzes);
+    insertQuizzes(quizzes);
   }
   else if (user.role === "student") {
-
+    console.log('tite')
   }
 }

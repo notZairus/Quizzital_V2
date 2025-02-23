@@ -9,7 +9,10 @@ import { useNavigate } from 'react-router-dom';
 export default function ProfessorClassroom() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
-  const { classrooms, setClassrooms } = useContext(ClassroomContext);
+  const { classrooms, insertClassroom } = useContext(ClassroomContext);
+
+  console.log("classrooms: ")
+  console.log(classrooms);
   
   function showAddClassroomForm() {
     Swal.fire({
@@ -40,7 +43,7 @@ export default function ProfessorClassroom() {
         });
 
         let new_classroom = await res.json()
-        setClassrooms([...classrooms, new_classroom])
+        insertClassroom([...classrooms, new_classroom])
       }
     });
   }

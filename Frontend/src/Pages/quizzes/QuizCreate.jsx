@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 export default function QuizCreate() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
-  const { quizzes, setQuizzes } = useContext(QuizContext);
+  const { quizzes, insertQuiz } = useContext(QuizContext);
   const [ multipleChoiceQuestions, setMultipleChoiceQuestions ] = useState([]);
   const [ idenficationQuestions, setIdenficationQuestions ] = useState([]);
   const quiz_name_ref = useRef(null);
@@ -124,15 +124,18 @@ export default function QuizCreate() {
       })
     })
 
-    setQuizzes([...quizzes, quiz]);
-
     Swal.fire({
       icon: 'success',
       title: 'Quiz Created',
-      text: 'Quiz successfully created.'
-    })
+      text: 'Quiz successfully created.',
+      preConfirm: async () => {
+        let res3 = await fetch(backendUrl(`/quiz?user_id=${currentUser.id}`));
+        let newQuizzes = await res3.json();
+        insertQuiz(newQuizzes);
 
-    navigate('/quiz');
+        navigate('/quiz');
+      }
+    })
   }
 
 

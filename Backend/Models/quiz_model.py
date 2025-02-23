@@ -7,6 +7,7 @@ class Quiz(db.Model):
   name = db.Column(db.String(100), nullable=False)
   number_of_questions = db.Column(db.Integer, nullable=False, default=0)
   created_at = db.Column(db.DateTime, default = datetime.now())
+  questions = db.relationship('Question', backref='quiz', lazy='joined', cascade="all, delete-orphan")  
 
   def __repr__(self):
     return f"Quiz(id={self.id}, user_id={self.user_id}, name={self.name}, number_of_questions={self.number_of_questions}, created_at={self.created_at})"
@@ -17,5 +18,6 @@ class Quiz(db.Model):
       'user_id': self.user_id,
       'name': self.name,
       'number_of_questions': self.number_of_questions,
-      'created_at': self.created_at
+      'created_at': self.created_at,
+      'questions': [q.to_json() for q in self.questions]
     }

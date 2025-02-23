@@ -36,7 +36,12 @@ export default function Layout() {
             <img src={sideExpanded ? cross_icon : burger_icon} alt="asdasd" />
           </div>
           <div>
-            <h1 className="font-bold text-3xl">Quizzital V2</h1>
+            <h1 className="font-bold text-3xl cursor-pointer" onClick={() => {
+              navigate('/classroom');
+              setSideExpanded(false);
+            }}>
+              Quizzital V2
+            </h1>
           </div>
           <div></div>
         </header>
@@ -67,7 +72,7 @@ export default function Layout() {
                   <div className="w-8">
                     <img src={window.location.pathname == '/ai' ? acc_settings : acc_settings_gray} />
                   </div>
-                  Ai Quiz Maker
+                  Ai Quiz Generator
                 </div>
               </div>
             </nav>

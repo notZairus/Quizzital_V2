@@ -11,5 +11,23 @@ class Classroom(db.Model):
   users = db.relationship('User', secondary=classroom_user_tbl, back_populates='classrooms')
 
   def __repr__(self):
-    return f"Classroom(id={self.id}, user_id={self.user_id}, name={self.name}, classroom_key={self.classroom_key})"
-  
+    return f"Classroom(id={self.id}, user_id={self.user_id}, name={self.name}, classroom_key={self.classroom_key}, created_at:{self.created_at}, students:{self.users})"
+
+  def to_json(self):
+    return {
+        "id": self.id,
+        "user_id": self.user_id,
+        "name": self.name,
+        "classroom_key": self.classroom_key,
+        "created_at": self.created_at,
+        "students": [{
+          'id': u.id,
+          "email": u.email,
+          "provider": u.provider,
+          "password": u.password,
+          "first_name": u.first_name,
+          "last_name": u.last_name,
+          "role": u.role,
+          "created_at": u.created_at,
+        } for u in self.users]
+    }
