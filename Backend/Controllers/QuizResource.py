@@ -16,6 +16,9 @@ class update_quiz_name_validator(BaseModel):
   quiz_id: int
   quiz_name: str
 
+class delete_quiz_validator(BaseModel):
+  quiz_id: int
+
 
 
 class QuizResource(Resource):
@@ -67,3 +70,11 @@ class QuizResource(Resource):
 
     except ValidationError as e:
       return jsonify({ 'message': e.errors() })
+    
+  def delete(self):
+    data = request.get_json()
+    validated_data = delete_quiz_validator(**data).model_dump()
+    quiz = Quiz.query.get(validated_data['quiz_id'])
+    db.session.delete(quiz)
+    db.session.commit()
+    return jsonify({'message': 'success'})

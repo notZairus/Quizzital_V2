@@ -2,11 +2,12 @@ import Heading1 from "../../Components/Heading1";
 import { useContext, useRef, useState } from "react";
 import ButtonLarge from '../../Components/ButtonLarge';
 import { QuizContext } from '../../contexts/QuizContext';
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { backendUrl } from '../../js/functions.js';
 import Swal from 'sweetalert2';
 import { getQuizzes } from "../../js/functions.js";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
+import { nanoid } from "nanoid";
 
 
 export default function QuizCreate() {
@@ -17,6 +18,7 @@ export default function QuizCreate() {
   const { quizzes } = useContext(QuizContext);
   const quiz_name_ref = useRef(null);
   const [currentQuiz, setCurrentQuiz] = useState(quizzes.find(quiz => quiz.id == id));
+  const [deleted, setDeleted] = useState([]);
 
 
   async function deleteQuiz() {
@@ -26,13 +28,95 @@ export default function QuizCreate() {
       showConfirmButton: true,
       showCancelButton: true,
       confirmButtonText: 'Confirm',
-      preConfirm: () => {
-        console.log('deleted');
+      preConfirm: async () => {
+        await fetch(backendUrl('/quiz'), {
+          method: 'DELETE',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            'quiz_id': currentQuiz.id
+          })
+        })
+
+        Swal.fire({
+          'title': 'Success',
+          'icon': 'success',
+          'text': 'Quiz updated successfully!',
+          preConfirm: async () => {
+            await getQuizzes(currentUser, insertQuiz);
+            navigate(`/quiz`)
+          }
+        })
       }
     })
   }
 
   async function updateQuiz() {
+
+    let multipleChoiceQuestions = currentQuiz.questions.filter(q => q.type === "multiple_choice")
+    let idenficationQuestions = currentQuiz.questions.filter(q => q.type === "identification")
+    let invalid = false;
+
+    // validate quiz name
+    if (quiz_name_ref.current.value === "") {
+      Swal.fire({
+        icon: 'error',
+        title: 'Empty Quiz Name.',
+        text: 'Quiz name is required.'
+      })
+      return;
+    }
+      
+    // validate multiple choice questions
+    multipleChoiceQuestions.forEach(question => {
+      if (question.question === "" || question.answer === "") {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Question",
+          text: "A multiple choice with a blank field is detected."
+        })
+        invalid = true;
+      }
+
+      if (question.choices.length < 3) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Question",
+          text: "A multiple choice with a blank field is detected."
+        })
+        invalid = true;
+      }
+
+      question.choices.forEach(choice => {
+        if (choice.trim().length < 1) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Question",
+            text: "A multiple choice with a blank field is detected."
+          })
+          invalid = true;
+          return;
+        }
+      })
+    })
+
+    if (invalid) return;
+
+    idenficationQuestions.forEach(question => {
+      if (question.question === "" || question.answer === "") {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Question",
+          text: "An identification with a blank field is detected."
+        })
+        invalid = true;
+      }
+    })
+
+    if (invalid) return;
+
+
     
     // Edit the Quiz name
     let res1 = await fetch(backendUrl('/quiz'), {
@@ -54,14 +138,28 @@ export default function QuizCreate() {
           'Content-type': 'application/json'
         },
         body: JSON.stringify({
-          question_id: q.id,
+          question_id: q.id.length == 100 ? null : q.id,
           quiz_id: currentQuiz.id,
           question: q.question,
           choices: q.choices,
-          answer: q.answer
+          answer: q.answer,
+          type: q.type
         })
       })
     });
+
+    deleted.forEach(async (q_id) => {
+      let res3 = await fetch(backendUrl('/question'), {
+        method: 'DELETE',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          'question_id': q_id
+        })
+      })
+    })
+
 
     Swal.fire({
       'title': 'Success',
@@ -69,9 +167,28 @@ export default function QuizCreate() {
       'text': 'Quiz updated successfully!',
       preConfirm: async () => {
         await getQuizzes(currentUser, insertQuiz);
-        navigate(`/quiz/${currentQuiz.id}`)
+        navigate(`/quiz/${currentQuiz.id}/edit`)
       }
     })
+  }
+
+  function addMCQuestion() {
+    setCurrentQuiz(prev => ({...prev, questions: [...prev.questions, {id: nanoid(100), answer: "", choices: ["", "", ""], question: "", quiz_id: currentQuiz.id, type: "multiple_choice"}]}))
+  }
+
+  function addIDQuestion() {
+    setCurrentQuiz(prev => ({...prev, questions: [...prev.questions, {id: nanoid(100), answer: "", choices: null, question: "", quiz_id: currentQuiz.id, type: "identification"}]}))
+  }
+
+  function removeQuestion(question_id) {
+    setCurrentQuiz(prev => {
+      let _questions = prev.questions.filter(qtn => qtn.id != question_id);
+      return {...prev, questions: _questions}
+    })
+
+    if (question_id.length != 100) {
+      setDeleted([...deleted, question_id]);
+    }
   }
 
 
@@ -106,7 +223,7 @@ export default function QuizCreate() {
               currentQuiz.questions.filter(question => question.type === "multiple_choice").map(question => (
                 <div key={question.id} className="w-full max-h-80 bg-white border-black borde rounded px-4 pt-2 pb-4">
                   <div className="flex justify-end">
-                    <button>
+                    <button onClick={() => removeQuestion(question.id)}>
                       X
                     </button>
                   </div>
@@ -197,7 +314,7 @@ export default function QuizCreate() {
                 </div>
               ))
             }
-            <div className="w-full h-20 bg-white/70 text-black/50 flex items-center rounded text-lg px-8 cursor-pointer">
+            <div onClick={addMCQuestion} className="w-full h-20 bg-white/70 text-black/50 flex items-center rounded text-lg px-8 cursor-pointer">
               Add Multiple Choice Question
             </div>
           </div>
@@ -209,7 +326,7 @@ export default function QuizCreate() {
               currentQuiz.questions.filter(question => question.type === "identification").map(question => (
                 <div key={question.id} className="w-full max-h-80 bg-white border-black borde rounded px-4 pt-2 pb-4">
                   <div className="flex justify-end">
-                    <button>
+                    <button onClick={() => removeQuestion(question.id)}>
                       X
                     </button>
                   </div>
@@ -253,11 +370,10 @@ export default function QuizCreate() {
                 </div>
               ))
             }
-            <div className="w-full h-20 bg-white/70 text-black/50 flex items-center rounded text-lg px-8 cursor-pointer">
+            <div onClick={addIDQuestion} className="w-full h-20 bg-white/70 text-black/50 flex items-center rounded text-lg px-8 cursor-pointer">
               Add Identification Question
             </div>
           </div>    
-          
         </div>
       </div>
 
