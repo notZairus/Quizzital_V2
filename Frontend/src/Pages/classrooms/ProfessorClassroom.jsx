@@ -13,6 +13,7 @@ export default function ProfessorClassroom() {
 
   console.log("classrooms: ")
   console.log(classrooms);
+
   
   function showAddClassroomForm() {
     Swal.fire({

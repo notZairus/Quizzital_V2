@@ -10,7 +10,6 @@ const ClassroomShow = lazy(() => import('./Pages/classrooms/Show.jsx'));
 
 const Quizzes = lazy(() => import('./Pages/quizzes/Quizzes.jsx'));
 const QuizShow = lazy(() => import('./Pages/quizzes/Show.jsx'));
-const QuizEdit = lazy(() => import('./Pages/quizzes/Edit.jsx'));
 
 
 const Layout = lazy(() => import('./Layout.jsx'));
@@ -41,8 +40,6 @@ function App() {
 
               <Route path='/quiz' element={<Quizzes />}/>
               {currentUser && currentUser.role === "professor" && <Route path="/quiz/:id" element={<QuizShow />} />}
-              {currentUser && currentUser.role === "professor" && <Route path="/quiz/:id/edit" element={<QuizEdit />} />}
-
 
               <Route path='/quiz/create' element={<QuizCreate />}/>
               <Route path='/ai' element={<Ai />}/>

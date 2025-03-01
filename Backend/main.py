@@ -11,6 +11,7 @@ from Models.classroom_model import Classroom
 from Models.user_model import User
 from Models.quiz_model import Quiz
 from Models.question_model import Question
+from Models.activity_model import Activity
 
 
 
@@ -33,6 +34,9 @@ api.add_resource(QuizResource, '/quiz')
 from Controllers.QuestionResource import QuestionResource
 api.add_resource(QuestionResource, '/question')
 
+from Controllers.ActivityResource import ActivityResource
+api.add_resource(ActivityResource, '/activity')
+
 
 
 @app.route('/user-role', methods=['PATCH'])
@@ -49,8 +53,6 @@ def get_role():
     db.session.commit()
 
     return jsonify(user.get_json())
-
-
 
 
 if __name__ == "__main__":

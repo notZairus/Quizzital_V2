@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Outlet,  useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./contexts/AuthContext";
+import { ClassroomContext } from "./contexts/ClassroomContext";
+import { QuizContext } from "./contexts/QuizContext";
+
 
 import burger_icon from './assets/icons/burger-icon.svg';
 import cross_icon from './assets/icons/cross-svgrepo-com.svg'
@@ -16,12 +19,18 @@ import acc_settings_gray from './assets/icons/settings-svgrepo-com (gray).svg'
 export default function Layout() {
   const navigate = useNavigate();
   const [sideExpanded, setSideExpanded] = useState(false);
-  const { logout, currentUser } = useContext(AuthContext)
+  const { logout, currentUser } = useContext(AuthContext);
+  const { insertClassroom } = useContext(ClassroomContext);
+  const { insertQuiz } = useContext(QuizContext);
 
   function handleLogout() {
+    const clearData = () => {
+      insertClassroom([]);
+      insertQuiz([]);
+    };
+
+    clearData();
     logout();
-    localStorage.removeItem('quizzes');
-    localStorage.removeItem('classrooms');
     navigate('/login')
   }
 
@@ -54,7 +63,7 @@ export default function Layout() {
                   <div className="w-8">
                     <img src={window.location.pathname.startsWith('/classroom') ? school_icon : school_icon_gray} />
                   </div>
-                  Classrooms
+                  Classroom
                 </div>
               </div>
   
@@ -63,7 +72,7 @@ export default function Layout() {
                       <div className="w-8">
                         <img src={window.location.pathname.startsWith('/quiz') ? quizzes_icon : quizzes_icon_gray} />
                       </div>
-                  Quizzes
+                  Quiz
                 </div>
               </div>}
   

@@ -45,7 +45,7 @@ export default function Quizzes() {
   return (
     <>
       <div className="flex items-start justify-between">
-        <Heading1>Quizzes</Heading1>
+        <Heading1>Quiz</Heading1>
         { currentUser.role == 'professor' && 
           <button 
             className="bg-BackgroundColor_Darker text-white px-4 py-2 rounded font-semibold shadow"
