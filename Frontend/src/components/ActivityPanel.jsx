@@ -5,6 +5,7 @@ import { ClassroomContext } from '../contexts/ClassroomContext';
 import { useContext, useState } from "react";
 import { backendUrl, getClassroom } from '../js/functions'; 
 import { useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 
 export default function ActivityPanel({ show, setShow, classroom_id }) {
@@ -26,6 +27,40 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
 
 
   async function createActivity() {
+    if (newActivity.name === "" || newActivity.name.length <= "2") {
+      Swal.fire({
+        'icon': 'error',
+        'title': 'Invalid Activity Name',
+        'text': 'Activity name must be longer than 2 characters.'
+      })
+      return;
+    }
+    
+    console.clear();
+
+    if (!newActivity.open_at) {
+      Swal.fire({
+        'icon': 'error',
+        'title': 'Invalid Open Time',
+        'text': 'Open time should never be null'
+      })
+      return;
+    }
+
+    if (newActivity.close_at) {
+      let open = new Date(newActivity.open_at).getTime();
+      let close = new Date(newActivity.close_at).getTime();
+
+      if (open >= close) {
+        Swal.fire({
+          'icon': 'error',
+          'title': 'Invalid Close Time',
+          'text': 'Opening time should never be later than closing time'
+        })
+        return;
+      }
+    }
+
     let res = await fetch(backendUrl('/activity'), {
       method: 'POST',
       headers: {

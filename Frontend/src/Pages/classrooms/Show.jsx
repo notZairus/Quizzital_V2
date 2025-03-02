@@ -48,10 +48,10 @@ export default function ClassroomShow() {
         </div>
         <div className="flex-1 bg-white px-4 py-4 rounded min-h-96 border">
           <h2 className="text-2xl font-semibold">Activities</h2>
-          <div className="mt-4">
+          <div className="grid grid-cols-3 gap-2 mt-4">
             {
               currentClassroom.activities.map(activity => (
-                <div key={activity.id} className="w-full border p-4 rounded">{activity.name}</div>
+                <div key={activity.id} className={`w-full border p-4 rounded text-xl`}>{activity.name}</div>
               ))
             }
           </div>
