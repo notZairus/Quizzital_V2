@@ -48,3 +48,14 @@ export async function getQuizzes(user, insertQuizzes) {
     console.log('tite')
   }
 }
+
+
+export function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = () => resolve(reader.result); // Return Base64 string
+      reader.onerror = error => reject(error);
+  });
+}

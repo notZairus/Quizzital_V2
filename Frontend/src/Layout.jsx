@@ -39,7 +39,7 @@ export default function Layout() {
       <div className="w-full min-h-screen bg-BackgroundColor text-TextColor">
 
         <header 
-          className="left-0 right-0 h-20 bg-white shadow flex justify-between items-center absolute z-10 px-8" 
+          className="left-0 right-0 h-20 bg-white shadow flex justify-between items-center absolute z-20 px-8" 
         >
           <div className="w-12 aspect-square" onClick={() => setSideExpanded(!sideExpanded)}>
             <img src={sideExpanded ? cross_icon : burger_icon} alt="asdasd" />
@@ -56,7 +56,7 @@ export default function Layout() {
         </header>
         
         <div className="flex h-full">
-          <div className={`${sideExpanded ? "w-80 " : 'w-0'} pb-4 flex flex-col justify-between pt-20 h-full shadow bg-white transition-all duration-500 overflow-hidden absolute left-0`}>
+          <div className={`${sideExpanded ? "w-80 " : 'w-0'} z-10 pb-4 flex flex-col justify-between pt-20 h-full shadow bg-white transition-all duration-500 overflow-hidden absolute left-0`}>
             <nav>
               <div onClick={() => navigate('/classroom')}>
                 <div className={`${window.location.pathname.startsWith('/classroom') ? 'text-white bg-BackgroundColor_Darker' : 'text-gray-300'} transition-all duration-300 flex items-center font-semibold gap-4 text-2xl px-8 py-6`}>

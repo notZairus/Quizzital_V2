@@ -5,6 +5,7 @@ import { ClassroomContext } from '../contexts/ClassroomContext';
 import { useContext, useState } from "react";
 import { backendUrl, getClassroom } from '../js/functions'; 
 import { useNavigate } from "react-router-dom";
+import Toast from './Toast';
 import Swal from 'sweetalert2';
 
 
@@ -19,7 +20,7 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
     'name': "",
     "score": 100,
     "classroom_id": classroom_id,
-    "quiz_id": quizzes[0].id,
+    "quiz_id": quizzes.length === 0 ? null : quizzes[0].id,
     "open_at": null,
     "close_at": null,
     "timer": null
@@ -35,8 +36,6 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
       })
       return;
     }
-    
-    console.clear();
 
     if (!newActivity.open_at) {
       Swal.fire({
@@ -69,9 +68,16 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
       body: JSON.stringify({...newActivity, timer: newActivity.timer * 60})
     })
 
+
+
+    Toast("success", "Activity created!", 1000);
     await getClassroom(currentUser, insertClassroom)
     setShow(false)
-    navigate(0)
+
+  
+    setTimeout(async () => {
+      navigate(0);
+    }, 1000)
   }
 
 

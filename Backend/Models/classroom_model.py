@@ -7,6 +7,8 @@ class Classroom(db.Model):
   id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   name = db.Column(db.String(100), nullable=False)
+  description = db.Column(db.Text)
+  img_url = db.Column(db.String(150), nullable=False)
   classroom_key = db.Column(db.String(150), nullable=False, unique=True)
   created_at = db.Column(db.DateTime, default=datetime.now())
   users = db.relationship('User', secondary=classroom_user_tbl, back_populates='classrooms')
@@ -20,7 +22,9 @@ class Classroom(db.Model):
         "id": self.id,
         "user_id": self.user_id,
         "name": self.name,
-        "classroom_key": self.classroom_key,
+        "description": self.description,
+        "img_url": self.img_url,
+      "classroom_key": self.classroom_key,
         "created_at": self.created_at,
         "students": [{
           'id': u.id,

@@ -1,11 +1,15 @@
 import { lazy, Suspense, useContext } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import QuizCreate from './Pages/quizzes/QuizCreate.jsx';
-import { AuthContext } from './contexts/AuthContext.jsx'
+import { AuthContext } from './contexts/AuthContext.jsx';
+import ProfessorRoute from './Components/ProfessorRoute.jsx';
 
 
 const Classrooms = lazy(() => import('./Pages/classrooms/Index.jsx'));
 const ClassroomShow = lazy(() => import('./Pages/classrooms/Show.jsx'));
+
+
+const ActivityArea = lazy(() => import('./Components/ActivityArea.jsx'))
 
 
 const Quizzes = lazy(() => import('./Pages/quizzes/Quizzes.jsx'));
@@ -36,17 +40,23 @@ function App() {
             <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
 
               <Route path="/classroom" element={<Classrooms />} />
-              {currentUser && currentUser.role === 'professor' && <Route path="/classroom/:id" element={<ClassroomShow />} />}
+              <Route path="/classroom/:id" element={<ClassroomShow />} />
 
-              <Route path='/quiz' element={<Quizzes />}/>
+              <Route path='/quiz' element={<ProfessorRoute><Quizzes /></ProfessorRoute>}/>
               {currentUser && currentUser.role === "professor" && <Route path="/quiz/:id" element={<QuizShow />} />}
 
               <Route path='/quiz/create' element={<QuizCreate />}/>
               <Route path='/ai' element={<Ai />}/>
             </Route>
+
             <Route path='/login' element={<Login />}/>
             <Route path='/register' element={<Register />}/>
+
             <Route path='/user-roles' element={<UserRoles />}/>
+
+            <Route path="/activity-area" element={<ActivityArea />} />
+
+
           </Routes>
         </Suspense>
       </BrowserRouter>

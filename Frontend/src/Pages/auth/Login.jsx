@@ -8,6 +8,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { ClassroomContext } from "../../contexts/ClassroomContext";
 import { QuizContext } from "../../contexts/QuizContext";
 import { useNavigate } from "react-router-dom";
+import Toast from '../../Components/Toast.js';
 
 
 const Register = lazy(() => import('./Register'))
@@ -91,21 +92,15 @@ export default function Login() {
     })
 
     if (res.status == 404) {
-      Swal.fire({
-        icon: 'error',
-        title: 'User not found.',
-        text: 'User with this email doesn\'t exist'
-      })
+      Toast('error', 'user not found!')
       return;
     }
 
     let user = await res.json();
 
     if (user && user.password === formData.password) {
-      Swal.fire({
-        'icon': 'success',
-        'title': 'Login Successfully!',
-      }) 
+      
+      Toast('success', 'Login Successfully!');
 
       login(user);
       
@@ -120,10 +115,7 @@ export default function Login() {
       navigate('/classroom');
       
     } else {
-      Swal.fire({
-        'icon': 'error',
-        'title': 'Incorrect Password!',
-      })
+      Toast('error', 'Incorrect Password.')
       return;
     }
   }

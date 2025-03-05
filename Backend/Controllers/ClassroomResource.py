@@ -43,6 +43,8 @@ class getClassroomResource(Resource):
 class add_classroom_validator(BaseModel):
   user_id: int
   name: Optional[str] = None
+  description: Optional[str] = None
+  img_url: Optional[str] = None
   classroom_key: str
   role: str
 
@@ -54,7 +56,7 @@ class ClassroomResource(Resource):
       print(validated_data)
 
       if (validated_data['role'] == 'professor'):
-        new_classroom = Classroom(user_id=validated_data['user_id'], name=validated_data['name'], classroom_key=validated_data['classroom_key'])
+        new_classroom = Classroom(user_id=validated_data['user_id'], name=validated_data['name'], description=validated_data['description'], img_url=validated_data['img_url'], classroom_key=validated_data['classroom_key'])
         print(validated_data)
         db.session.add(new_classroom)
         db.session.commit()
