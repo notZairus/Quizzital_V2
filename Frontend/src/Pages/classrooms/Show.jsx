@@ -29,7 +29,6 @@ export default function ClassroomShow() {
       alert('show act');
     }
 
-
     function answerActivity() {
       localStorage.setItem('activity', JSON.stringify(currentClassroom.activities.find(act => act.id == _id)));
       localStorage.setItem('currentClassroom', JSON.stringify(currentClassroom));

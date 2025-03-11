@@ -59,3 +59,8 @@ export function fileToBase64(file) {
       reader.onerror = error => reject(error);
   });
 }
+
+
+export function secondsToMinutes(seconds) {
+  return seconds / 60;
+}

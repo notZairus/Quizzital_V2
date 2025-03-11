@@ -25,6 +25,7 @@ export default function Layout() {
 
   function handleLogout() {
     const clearData = () => {
+      localStorage.clear();
       insertClassroom([]);
       insertQuiz([]);
     };
