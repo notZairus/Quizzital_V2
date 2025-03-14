@@ -61,6 +61,12 @@ export function fileToBase64(file) {
 }
 
 
-export function secondsToMinutes(seconds) {
-  return seconds / 60;
+export function formatSeconds(seconds) {
+  let mins = Math.floor(seconds / 60);
+  let secs = seconds % 60;
+
+  return mins <= 9 ? 
+    secs <= 9 ? `0${mins}:0${secs}` :  `${mins}:${secs}` :
+    secs <= 9 ? `${mins}:0${secs}` :  `${mins}:${secs}`
+
 }
