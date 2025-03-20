@@ -11,7 +11,7 @@ class post_activity_validator(BaseModel):
   classroom_id: int
   quiz_id: int
   name: str
-  score: int
+  perfect_score: int
   open_at: datetime
   close_at: Optional[datetime] = None
   timer: Optional[int] = None

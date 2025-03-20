@@ -17,7 +17,8 @@ const QuizShow = lazy(() => import('./Pages/quizzes/Show.jsx'));
 
 
 const Layout = lazy(() => import('./Layout.jsx'));
-const ProtectedRoute = lazy(() => import('./Components/ProtectedRoute.jsx'))
+const AuthenticatedRoute = lazy(() => import('./Components/AuthenticatedRoute.jsx'))
+const UnauthenticatedRoute = lazy(() => import('./Components/UnauthenticatedRoute.jsx'))
 const UserRoles = lazy(() => import('./Components/UserRoles.jsx'))
 
 
@@ -29,33 +30,37 @@ const Ai = lazy(() => import('./Pages/Ai.jsx'))
 
 function App() {
   const { currentUser } = useContext(AuthContext);
-
-  console.log(currentUser)
-
+  
   return (
     <>
       <BrowserRouter> 
         <Suspense>
           <Routes key={location.pathname}>
-            <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-
+            
+            <Route path="/" element={<AuthenticatedRoute><Layout /></AuthenticatedRoute>}>
+              
+              {/* Links of Classroom */}
               <Route path="/classroom" element={<Classrooms />} />
               <Route path="/classroom/:id" element={<ClassroomShow />} />
 
-              <Route path='/quiz' element={<ProfessorRoute><Quizzes /></ProfessorRoute>}/>
-              {currentUser && currentUser.role === "professor" && <Route path="/quiz/:id" element={<QuizShow />} />}
+              {/* Links of Questionnaire */}
+              <Route path='/questionnaire' element={<ProfessorRoute><Quizzes /></ProfessorRoute>}/>
+              {currentUser && currentUser.role === "professor" && <Route path="/questionnaire/:id" element={<QuizShow />} />}
+              <Route path='/questionnaire/create' element={<QuizCreate />}/>
 
-              <Route path='/quiz/create' element={<QuizCreate />}/>
               <Route path='/ai' element={<Ai />}/>
+
             </Route>
+            
+            {/* Sessions */}
+            <Route path='/login' element={<UnauthenticatedRoute><Login /></UnauthenticatedRoute>}/>
+            <Route path='/register' element={<UnauthenticatedRoute><Register /></UnauthenticatedRoute>}/>
 
-            <Route path='/login' element={<Login />}/>
-            <Route path='/register' element={<Register />}/>
-
+            {/* Shows up when the user has no roles yet. */}
             <Route path='/user-roles' element={<UserRoles />}/>
 
+            {/* Activity Area */}
             <Route path="/activity-area" element={<ActivityArea />} />
-
 
           </Routes>
         </Suspense>

@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_restful import Api
 import os
 from configs import db, app, api
 
@@ -12,6 +11,8 @@ from Models.user_model import User
 from Models.quiz_model import Quiz
 from Models.question_model import Question
 from Models.activity_model import Activity
+from Models.activity_record_model import ActivityRecord
+from Models.answer_model import Answer
 
 
 
@@ -36,6 +37,12 @@ api.add_resource(QuestionResource, '/question')
 
 from Controllers.ActivityResource import ActivityResource
 api.add_resource(ActivityResource, '/activity')
+
+from Controllers.ActivityRecordResource import ActivityRecordResource
+api.add_resource(ActivityRecordResource, '/activity-record');
+
+from Controllers.AnswerResource import AnswerResource
+api.add_resource(AnswerResource, '/answer')
 
 
 

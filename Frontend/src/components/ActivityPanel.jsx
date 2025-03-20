@@ -18,7 +18,7 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
 
   const [newActivity, setNewActivity] = useState({
     'name': "",
-    "score": 100,
+    "perfect_score": 100,
     "classroom_id": classroom_id,
     "quiz_id": quizzes.length === 0 ? null : quizzes[0].id,
     "open_at": null,
@@ -85,7 +85,7 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
     <>
       <div 
         onClick={() => setShow(false)} 
-        className={`flex justify-end h-full top-0 absolute right-0 ${show ? "w-full opacity-100" : "w-0 opacity-0"} transition-all duration-1000 overflow-hidden`}
+        className={`flex justify-end h-full top-0 fixed right-0 ${show ? "w-full opacity-100" : "w-0 opacity-0"} transition-all duration-1000 overflow-hidden`}
       >
         <div onClick={(e) => e.stopPropagation()} className="w-2/5 h-full overflow-auto bg-white px-8 pt-24 shadow-xl">
           <Heading1>Create Activity</Heading1>

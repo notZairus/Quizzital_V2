@@ -70,3 +70,7 @@ export function formatSeconds(seconds) {
     secs <= 9 ? `${mins}:0${secs}` :  `${mins}:${secs}`
 
 }
+
+export function processWord(word) {
+  return word.replaceAll(' ', '').replaceAll('.', '').replaceAll('-', '').toLowerCase();
+}

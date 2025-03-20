@@ -33,7 +33,6 @@ export default function Ai() {
         title: 'Invalid Input.'
       })
     }
-    
   }
 
   function copyQuiz() {
@@ -44,7 +43,7 @@ export default function Ai() {
 
   return (
     <>
-      <Heading1>Generate Quiz</Heading1>
+      <Heading1>Generate Questionnaire</Heading1>
       <div className="w-full my-4 h-[500px] flex gap-4">
         <form onSubmit={generateQuiz} className="w-2/5 bg-white rounded flex flex-col border">
           <textarea ref={inputTextAreaRef} className="flex-1 resize-none p-4 py-3 text-lg outline-none rounded" />

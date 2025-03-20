@@ -131,9 +131,10 @@ export default function QuizCreate() {
       preConfirm: async () => {
         let res3 = await fetch(backendUrl(`/quiz?user_id=${currentUser.id}`));
         let newQuizzes = await res3.json();
+        setTimeout(2000);
         insertQuiz(newQuizzes);
 
-        navigate('/quiz');
+        navigate('/questionnaire');
       }
     })
   }
@@ -159,10 +160,10 @@ export default function QuizCreate() {
 
   return (
     <>
-      <Heading1>Create Quiz</Heading1>
+      <Heading1>Create Questionnaire</Heading1>
 
       <div className="my-12">
-        <p className="text-xl mb-2">Quiz Name: </p>
+        <p className="text-xl mb-2">Questionnaire Name: </p>
         <input ref={quiz_name_ref} type="text" className="w-1/2 text-2xl px-4 py-3 rounded border"/>
       </div>
       
@@ -337,7 +338,7 @@ export default function QuizCreate() {
       </div>
 
       <div className="mt-8 flex justify-end">
-        <ButtonLarge onClick={createQuiz}>Create Quiz</ButtonLarge>
+        <ButtonLarge onClick={createQuiz}>Create</ButtonLarge>
       </div>
     </>
   )

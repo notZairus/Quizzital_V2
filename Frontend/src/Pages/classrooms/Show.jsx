@@ -19,6 +19,18 @@ export default function ClassroomShow() {
   const [showCreateActivityPanel, setShowCreateActivityPanel] = useState(false);
   const [isProf, setIsProf] = useState(currentUser.role == 'professor')
 
+
+
+  const [learningMaterials, setLearningMaterials] = useState([]);
+  // IMPLEMENT UPLOADS OF LEARNING MATERIALS
+  // IMPLEMENT UPLOADS OF LEARNING MATERIALS
+  // IMPLEMENT UPLOADS OF LEARNING MATERIALS
+  // IMPLEMENT UPLOADS OF LEARNING MATERIALS
+  // IMPLEMENT UPLOADS OF LEARNING MATERIALS
+  // IMPLEMENT UPLOADS OF LEARNING MATERIALS
+
+
+
   function openActivity(_id) {
     isProf 
       ? showActivity()
@@ -36,6 +48,8 @@ export default function ClassroomShow() {
     }
   }
 
+  console.log(currentClassroom);
+
 
   return (
     <>
@@ -50,9 +64,11 @@ export default function ClassroomShow() {
             Create Activity
           </button> }
       </div>
-      <p>{currentClassroom.description}</p>
-      <hr className="mb-8 mt-4"/>
+      {currentClassroom.description && <p className="mb-4">{currentClassroom.description}</p>}
+      <hr className="mb-8"/>
       <div className="flex gap-4">
+
+        {/* STUDENT DIV */}
         {isProf && <div className="w-2/5 h-min bg-white px-4 rounded border py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold">Students</h1>
@@ -66,22 +82,45 @@ export default function ClassroomShow() {
             }
           </div>
         </div>}
-        <div className="flex-1 bg-white px-4 py-4 rounded border">
-          <h2 className="text-2xl font-semibold">Activities</h2>
-          <div className="grid grid-cols-3 gap-2 mt-4">
-            {
-              currentClassroom.activities.map(activity => (
-                <div 
-                  key={activity.id} 
-                  className="cursor-pointer w-full border-2 p-4 rounded text-xl hover:border-BackgroundColor_Darker transition-all duration-200"
-                  onClick={() => openActivity(activity.id)}
-                >
-                  {activity.name}
-                </div>
-              ))
-            }
-          </div>
-        </div>  
+        <div className="flex-1 space-y-2">
+
+          {/* ACTIVITY DIV */}
+          <div className="flex-1 bg-white px-4 py-4 rounded border">
+            <h2 className="text-2xl font-semibold">Activities</h2>
+            <div className="grid gap-2 mt-4">
+              {
+                currentClassroom.activities.map(activity => (
+                  <div 
+                    key={activity.id} 
+                    className="cursor-pointer w-full border-2 p-4 rounded text-xl hover:border-BackgroundColor_Darker transition-all duration-200"
+                    onClick={() => openActivity(activity.id)}
+                  >
+                    {activity.name}
+                  </div>
+                ))
+              }
+            </div>
+          </div>  
+
+          {/* LEARNING MATERIALS DIV */}
+          {/* TO BE IMPLEMENTED */}
+          <div className="flex-1 bg-white px-4 py-4 rounded border">
+            <h2 className="text-2xl font-semibold">Materials</h2>
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              {
+                learningMaterials.map(activity => (
+                  <div 
+                    key={activity.id} 
+                    className="cursor-pointer w-full border-2 p-4 rounded text-xl hover:border-BackgroundColor_Darker transition-all duration-200"
+                    onClick={() => openActivity(activity.id)}
+                  >
+                    {activity.name}
+                  </div>
+                ))
+              }
+            </div>
+          </div>  
+        </div>
       </div>
     </>
   )

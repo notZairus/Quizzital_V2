@@ -52,10 +52,6 @@ export default function ProfessorClassroom() {
           return;
         }
 
-        if (description.length <= 0) {
-          return;
-        }
-
         let img_url = "https://i.ibb.co/MDTKHVS6/3d-illustration-human-avatar-profile-23-2150671142.jpg";
         if (classroom_img) {
           let base64 = await fileToBase64(classroom_img);
@@ -113,7 +109,7 @@ export default function ProfessorClassroom() {
         ))
       }
       <div onClick={showAddClassroomForm} className=" h-64 flex hover:bg-black/15 transition-all duration-200 items-center justify-center text-3xl cursor-pointer bg-black/10 text-black/50 rounded-3xl">
-        + New Room
+        New Classroom
       </div>
     </div>
   )

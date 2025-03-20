@@ -28,7 +28,7 @@ export default function Quizzes() {
       <div 
         key={quiz.id}
         className="w-full h-20 bg-white rounded border flex justify-between items-center px-8 cursor-pointer"
-        onClick={() => navigate(`/quiz/${quiz.id}`)}
+        onClick={() => navigate(`/questionnaire/${quiz.id}`)}
       >
         <p><span className="text-gray-400">ID:</span> <span className="font-semibold text-lg">{quiz.id}</span></p>
         <p><span className="text-gray-400">Name:</span> <span className="font-semibold text-lg">{quiz.name}</span></p>
@@ -45,13 +45,13 @@ export default function Quizzes() {
   return (
     <>
       <div className="flex items-start justify-between">
-        <Heading1>Quiz</Heading1>
+        <Heading1>Questionnaire</Heading1>
         { currentUser.role == 'professor' && 
           <button 
             className="bg-BackgroundColor_Darker text-white px-4 py-2 rounded font-semibold shadow"
-            onClick={() => navigate('/quiz/create')}
+            onClick={() => navigate('/questionnaire/create')}
           >
-            Create Quiz
+            Create
           </button> 
         }
       </div>

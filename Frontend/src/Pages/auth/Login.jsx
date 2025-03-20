@@ -10,6 +10,9 @@ import { QuizContext } from "../../contexts/QuizContext";
 import { useNavigate } from "react-router-dom";
 import Toast from '../../Components/Toast.js';
 
+import eye_open from '../../assets/icons/eye-open.svg';
+import eye_closed from '../../assets/icons/eye-closed.svg';
+
 
 const Register = lazy(() => import('./Register'))
 
@@ -23,6 +26,7 @@ export default function Login() {
     'email': '',
     'password': ''
   })
+  const [showPassword, setShowPassword] = useState(false);
 
   console.log(classrooms);
   console.log(quizzes);
@@ -135,11 +139,38 @@ export default function Login() {
               <div className="flex flex-col space-y-5">
                   <label htmlFor="email">
                       <p className="font-medium text-slate-700 pb-2">Email address</p>
-                      <input required value={formData.email} onChange={(e) => setFormData(prev => ({...prev, 'email': e.target.value}))} id="email" name="email" type="email" className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter email address" />
+                      <input 
+                        autoComplete="false" 
+                        required 
+                        value={formData.email} 
+                        onChange={(e) => setFormData(prev => ({...prev, 'email': e.target.value}))} 
+                        id="email" name="email" 
+                        type="email" 
+                        className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" 
+                        placeholder="JohnDoe@gmail.com" 
+                      />
                   </label>
                   <label htmlFor="password">
                       <p className="font-medium text-slate-700 pb-2">Password</p>
-                      <input required value={formData.password} onChange={(e) => setFormData(prev => ({...prev, 'password': e.target.value}))} id="password" name="password" type="password" className="w-full py-3 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow" placeholder="Enter your password" />
+                      <div className="w-full border items-center border-slate-200 rounded-lg px-3 hover:shadow flex justify-between">
+                        <input 
+                          autoComplete="false" 
+                          type={showPassword ? "text" : "password"} 
+                          required value={formData.password} 
+                          id="password" 
+                          name="password" 
+                          onChange={(e) => setFormData(prev => ({...prev, 'password': e.target.value}))}
+                          className="w-full h-full outline-none py-3"
+                        />
+                        
+                        <div className="aspect-square w-8 flex items-center justify-center">
+                          <img 
+                            src={showPassword ? eye_open : eye_closed } 
+                            alt="show password button" 
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        </div>
+                      </div>
                   </label>
                   <button className="w-full py-3 font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg border-indigo-500 hover:shadow inline-flex space-x-2 items-center justify-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

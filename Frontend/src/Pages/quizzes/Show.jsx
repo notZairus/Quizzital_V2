@@ -45,7 +45,7 @@ export default function Show() {
           'text': 'Quiz updated successfully!',
           preConfirm: async () => {
             await getQuizzes(currentUser, insertQuiz);
-            navigate(`/quiz`)
+            navigate(`/questionnaire`)
           }
         })
       }
@@ -167,7 +167,7 @@ export default function Show() {
       'text': 'Quiz updated successfully!',
       preConfirm: async () => {
         await getQuizzes(currentUser, insertQuiz);
-        navigate(`/quiz/${currentQuiz.id}`)
+        navigate(`/questionnaire/${currentQuiz.id}`)
       }
     })
   }
@@ -191,21 +191,21 @@ export default function Show() {
     }
   }
 
-
+  
   return (
     <>
       <div className="flex justify-between items-start">
-        <Heading1><div><span className="cursor-pointer" onClick={() => navigate('/quiz')}>Quiz &gt;</span> {currentQuiz.name}</div></Heading1>
+        <Heading1><div><span className="cursor-pointer" onClick={() => navigate('/questionnaire')}>Questionnaire &gt;</span> {currentQuiz.name}</div></Heading1>
         <button 
           className="bg-red-500 text-white px-4 py-2 rounded font-semibold shadow"
           onClick={deleteQuiz}
         >
-          Delete Quiz
+          Delete
         </button>
       </div>
 
       <div className="mb-12 mt-4">
-        <p className="text-xl mb-2">Quiz Name: </p>
+        <p className="text-xl mb-2">Name: </p>
         <input 
           ref={quiz_name_ref} 
           type="text" 
