@@ -166,6 +166,9 @@ export default function ActivityArea() {
       let data = {
         'user_id': currentUser.id,
         'activity_id': activity.id,
+        'remarks': Math.round(questions.length * 0.7 / questions.length * activity.perfect_score) <= Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score) 
+                  ? "Passed!"
+                  : "Failed!",
         'user_score': Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score)
       }
 

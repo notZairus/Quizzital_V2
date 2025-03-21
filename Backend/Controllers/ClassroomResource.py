@@ -14,6 +14,7 @@ classroom_fields = {
   'users': fields.List
 }
 
+
 class get_owned_classroom_validator(BaseModel):
   user_id: int
   role: str

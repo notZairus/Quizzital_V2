@@ -17,8 +17,6 @@ export async function getClassroom(user, insertClassroom) {
     })
 
     let result = await response.json();
-    console.clear();
-    console.log(result);
     insertClassroom(result);
   }
   else if (user.role === "student") {

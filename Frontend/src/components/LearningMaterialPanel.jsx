@@ -9,14 +9,12 @@ import Toast from './Toast';
 import Swal from 'sweetalert2';
 
 
-export default function ActivityPanel({ show, setShow, classroom_id }) {
+export default function LearningMaterialPanel({ show, setShow, classroom_id }) {
   const navigate = useNavigate()
-  const { quizzes } = useContext(QuizContext);
   const { currentUser } = useContext(AuthContext);
   const { insertClassroom } = useContext(ClassroomContext);
-  const [hasTimer, setHasTimer] = useState(false);
 
-  const [newActivity, setNewActivity] = useState({
+  const [learningMaterialPanel, setLearningMaterialPanel] = useState({
     'name': "",
     "perfect_score": 100,
     "classroom_id": classroom_id,
@@ -26,56 +24,59 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
     "timer": null
   })
 
+  
+  // async function createActivity() {
+  //   if (newActivity.name === "" || newActivity.name.length <= "2") {
+  //     Swal.fire({
+  //       'icon': 'error',
+  //       'title': 'Invalid Activity Name',
+  //       'text': 'Activity name must be longer than 2 characters.'
+  //     })
+  //     return;
+  //   }
 
-  async function createActivity() {
-    if (newActivity.name === "" || newActivity.name.length <= "2") {
-      Swal.fire({
-        'icon': 'error',
-        'title': 'Invalid Activity Name',
-        'text': 'Activity name must be longer than 2 characters.'
-      })
-      return;
-    }
+  //   if (!newActivity.open_at) {
+  //     Swal.fire({
+  //       'icon': 'error',
+  //       'title': 'Invalid Open Time',
+  //       'text': 'Open time should never be null'
+  //     })
+  //     return;
+  //   }
 
-    if (!newActivity.open_at) {
-      Swal.fire({
-        'icon': 'error',
-        'title': 'Invalid Open Time',
-        'text': 'Open time should never be null'
-      })
-      return;
-    }
+  //   if (newActivity.close_at) {
+  //     let open = new Date(newActivity.open_at).getTime();
+  //     let close = new Date(newActivity.close_at).getTime();
 
-    if (newActivity.close_at) {
-      let open = new Date(newActivity.open_at).getTime();
-      let close = new Date(newActivity.close_at).getTime();
+  //     if (open >= close) {
+  //       Swal.fire({
+  //         'icon': 'error',
+  //         'title': 'Invalid Close Time',
+  //         'text': 'Opening time should never be later than closing time'
+  //       })
+  //       return;
+  //     }
+  //   }
 
-      if (open >= close) {
-        Swal.fire({
-          'icon': 'error',
-          'title': 'Invalid Close Time',
-          'text': 'Opening time should never be later than closing time'
-        })
-        return;
-      }
-    }
+  //   let res = await fetch(backendUrl('/activity'), {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-type': 'application/json',
+  //     },
+  //     body: JSON.stringify({...newActivity, timer: newActivity.timer * 60})
+  //   })
 
-    await fetch(backendUrl('/activity'), {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify({...newActivity, timer: newActivity.timer * 60})
-    })
 
-    Toast("success", "Activity created!", 1000);
-    await getClassroom(currentUser, insertClassroom)
-    setShow(false)
 
-    setTimeout(async () => {
-      navigate(0);
-    }, 1000)
-  }
+  //   Toast("success", "Activity created!", 1000);
+  //   await getClassroom(currentUser, insertClassroom)
+  //   setShow(false)
+
+  
+  //   setTimeout(async () => {
+  //     navigate(0);
+  //   }, 1000)
+  // }
 
 
   return (
@@ -85,7 +86,7 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
         className={`flex justify-end h-full top-0 fixed right-0 ${show ? "w-full opacity-100" : "w-0 opacity-0"} transition-all duration-1000 overflow-hidden`}
       >
         <div onClick={(e) => e.stopPropagation()} className="w-2/5 h-full overflow-auto bg-white px-8 pt-24 shadow-xl">
-          <Heading1>Create Activity</Heading1>
+          <Heading1>Upload Learning Material</Heading1>
           <div>
 
             <div className="space-y-4">

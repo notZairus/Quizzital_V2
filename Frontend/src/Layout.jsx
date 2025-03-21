@@ -105,7 +105,9 @@ export default function Layout() {
               </div>
             </nav>
             <div className="flex justify-center items-center px-4">
-              {/* Its here just in case you want to put something in the bottom of the sidebar */}
+              <div className="w-full px-4 py-2 bg-BackgroundColor_Darker/10 text-black text-xl text-center rounded">
+                {currentUser.role === 'student' ? 'Student' : 'Professor'}
+              </div>
             </div>
           </div>
   

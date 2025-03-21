@@ -7,10 +7,13 @@ from Models.activity_record_model import ActivityRecord
 from configs import db
 
 
+
 class post_activity_record_validator(BaseModel):
   user_id: int
   activity_id: int
   user_score: int
+  remarks: str
+  
 
 class ActivityRecordResource(Resource):
   def post(self):

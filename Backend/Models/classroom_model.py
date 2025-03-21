@@ -13,6 +13,7 @@ class Classroom(db.Model):
   created_at = db.Column(db.DateTime, default=datetime.now())
   users = db.relationship('User', secondary=classroom_user_tbl, back_populates='classrooms')
   activities = db.relationship('Activity')
+  learning_matetials = db.relationship('LearningMaterial')
 
   def __repr__(self):
     return f"Classroom(id={self.id}, user_id={self.user_id}, name={self.name}, classroom_key={self.classroom_key}, created_at:{self.created_at}, students:{self.users})"
@@ -24,7 +25,7 @@ class Classroom(db.Model):
         "name": self.name,
         "description": self.description,
         "img_url": self.img_url,
-      "classroom_key": self.classroom_key,
+        "classroom_key": self.classroom_key,
         "created_at": self.created_at,
         "students": [{
           'id': u.id,
@@ -36,5 +37,6 @@ class Classroom(db.Model):
           "role": u.role,
           "created_at": u.created_at,
         } for u in self.users],
-        "activities": [act.to_json() for act in self.activities]
+        "activities": [act.to_json() for act in self.activities],
+        "learning_materials": [mat.to_json() for mat in self.learning_matetials]
     }

@@ -9,10 +9,11 @@ class ActivityRecord(db.Model):
   user_id  = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
   activity_id = db.Column(db.Integer, db.ForeignKey('activity.id'), nullable=False)
   user_score = db.Column(db.Integer, nullable=False, default=0)
+  remarks = db.Column(db.String(20), nullable=False)
   recorded_at = db.Column(db.DateTime, default=datetime.now())
 
   def __repr__(self):
-    return f"ActivityRecord(id={self.id}, user_id={self.user_id}, activity_id={self.activity_id}, user_score={self.user_score}, recorded_at={self.recorded_at})"
+    return f"ActivityRecord(id={self.id}, user_id={self.user_id}, activity_id={self.activity_id}, user_score={self.user_score}, remarks={self.remarks}, recorded_at={self.recorded_at})"
   
   def to_json(self):
     return {
@@ -20,5 +21,6 @@ class ActivityRecord(db.Model):
       'user_id': self.user_id,
       'activity_id': self.activity_id,
       'user_score': self.user_score,
+      'remarks': self.remarks,
       'recorded_at': self.recorded_at
     }

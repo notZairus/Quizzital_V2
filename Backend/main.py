@@ -44,6 +44,9 @@ api.add_resource(ActivityRecordResource, '/activity-record');
 from Controllers.AnswerResource import AnswerResource
 api.add_resource(AnswerResource, '/answer')
 
+from Controllers.LearningMaterialResource import LearningMaterialResource
+api.add_resource(LearningMaterialResource, '/learning-material')
+
 
 
 @app.route('/user-role', methods=['PATCH'])
