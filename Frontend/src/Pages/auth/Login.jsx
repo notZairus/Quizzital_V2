@@ -28,10 +28,6 @@ export default function Login() {
   })
   const [showPassword, setShowPassword] = useState(false);
 
-  console.log(classrooms);
-  console.log(quizzes);
-
-
   async function googleSignIn() {
     let result = await signInWithPopup(auth, googleProvider);
 
@@ -62,13 +58,7 @@ export default function Login() {
     }
 
     let user = await response.json()
-
     login(user);
-
-    if (!user.role) {
-      navigate('/user-roles')
-      return;
-    }
 
     await getClassroom(user, insertClassroom);
     await getQuizzes(user, insertQuiz);
@@ -102,22 +92,16 @@ export default function Login() {
 
     let user = await res.json();
 
-    if (user && user.password === formData.password) {
-      
+
+    if (user && user.password === formData.password) {  
       Toast('success', 'Login Successfully!');
 
       login(user);
-      
-      if (!user.role) {
-        navigate('/user-roles')
-        return;
-      }
 
       await getClassroom(user, insertClassroom);
       await getQuizzes(user, insertQuiz);
-
       navigate('/classroom');
-      
+
     } else {
       Toast('error', 'Incorrect Password.')
       return;

@@ -2,6 +2,8 @@ export function backendUrl(address) {
   return import.meta.env.VITE_BACKEND_SERVER_URL + address;
 }
 
+export const mainColor = "#12B9D8";
+
 
 export async function getClassroom(user, insertClassroom) {
   if (user.role === "professor") {

@@ -1,6 +1,7 @@
 from configs import db
 from datetime import datetime
 from .classroom_user_tbl import classroom_user_tbl
+from sqlalchemy import select
 
 
 class Classroom(db.Model):
@@ -19,6 +20,12 @@ class Classroom(db.Model):
     return f"Classroom(id={self.id}, user_id={self.user_id}, name={self.name}, classroom_key={self.classroom_key}, created_at:{self.created_at}, students:{self.users})"
 
   def to_json(self):
+
+    stmt = select(classroom_user_tbl).where(classroom_user_tbl.c.classroom_id == self.id)
+    result = db.session.execute(stmt).fetchall()
+
+    user_statuses = {row.user_id: row.status for row in result}
+
     return {
         "id": self.id,
         "user_id": self.user_id,
@@ -36,6 +43,7 @@ class Classroom(db.Model):
           "last_name": u.last_name,
           "role": u.role,
           "created_at": u.created_at,
+          "status": user_statuses.get(u.id),
         } for u in self.users],
         "activities": [act.to_json() for act in self.activities],
         "learning_materials": [mat.to_json() for mat in self.learning_matetials]

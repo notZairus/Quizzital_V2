@@ -23,6 +23,8 @@ export default function ClassroomShow() {
   const [isProf, setIsProf] = useState(currentUser.role == 'professor')
   const fileInputRef = useRef(null);
 
+  console.log(currentClassroom);
+
   function openActivity(_id) {
     isProf 
       ? showActivity()
@@ -46,7 +48,7 @@ export default function ClassroomShow() {
         return;
       }
 
-      localStorage.setItem('activity', JSON.stringify());
+      localStorage.setItem('activity', JSON.stringify(currentActivity));
       localStorage.setItem('currentClassroom', JSON.stringify(currentClassroom));
       navigate('/activity-area');
     }
@@ -66,7 +68,6 @@ export default function ClassroomShow() {
 
   async function handleFileUpload() {
     try {
-
       let selectedFile = await uploadMaterial();
       let formData = new FormData();
 
@@ -99,6 +100,49 @@ export default function ClassroomShow() {
     }
   }
 
+  async function acceptRequest(student_id) {
+    let res = await fetch(backendUrl('/classroom-request'), {
+      method: 'PATCH',
+      headers: {
+        'Content-type' : 'application/json',
+      },
+      body: JSON.stringify({
+        'student_id': student_id,
+        'classroom_id': currentClassroom.id
+      })
+    })
+
+    let result = await res.json()
+
+    if (result.status === 200) {
+      let updated_students = currentClassroom.students.map(std => std.id == student_id ? {...std, status: 'accepted'} : std);
+      setCurrentClassroom({...currentClassroom, students: updated_students})
+      insertClassroom(classrooms.map((c) => c.id == currentClassroom.id ? {...currentClassroom, students: updated_students} : c));
+    }
+  }
+
+  async function declineRequest(student_id) {
+    let res = await fetch(backendUrl('/classroom-request'), {
+      method: 'DELETE',
+      headers: {
+        'Content-type' : 'application/json',
+      },
+      body: JSON.stringify({
+        'student_id': student_id,
+        'classroom_id': currentClassroom.id
+      })
+    })
+
+    let result = await res.json()
+
+    if (result.status === 200) {
+      let updated_students = currentClassroom.students.filter(std => std.id != student_id);
+      setCurrentClassroom({...currentClassroom, students: updated_students})
+      insertClassroom(classrooms.map((c) => c.id == currentClassroom.id ? {...currentClassroom, students: updated_students} : c));
+    }
+  }
+
+
 
   useEffect(() => {
     setCurrentClassroom(classrooms.find(classroom => classroom.id == id))
@@ -109,8 +153,9 @@ export default function ClassroomShow() {
       {isProf && <ActivityPanel show={showCreateActivityPanel} setShow={setShowCreateActivityPanel} classroom_id={id}/>}
         
       <div className="flex justify-between items-start">
-          <Heading1>{currentClassroom.name} {isProf && <span className="text-gray-300">(Key: {currentClassroom.classroom_key})</span>}</Heading1>
+        <Heading1>{currentClassroom.name} {isProf && <span className="text-gray-300">(Key: {currentClassroom.classroom_key})</span>}</Heading1>
       </div>
+
       {currentClassroom.description && <p className="mb-4">{currentClassroom.description}</p>}
       <hr className="mb-8"/>
       <div className="flex gap-4">
@@ -124,7 +169,13 @@ export default function ClassroomShow() {
           <div className="text-black mt-4 space-y-2">
             {
               currentClassroom.students.map((student, index) => (
-                <div key={student.id} className="w-full border p-4 rounded">{student.first_name} {student.last_name}</div>
+                <div key={student.id} className="w-full border p-4 rounded flex justify-between">
+                  <p>{student.first_name} {student.last_name}</p>
+                  {student.status === 'pending' && <div className="flex gap-4">
+                    <button onClick={() => acceptRequest(student.id)}className="text-blue-400 hover:text-blue-600">Accept</button>
+                    <button onClick={() => declineRequest(student.id)} className="text-red-400 hover:text-red-600">Decline</button>
+                  </div>}
+                </div>
               ))
             }
           </div>

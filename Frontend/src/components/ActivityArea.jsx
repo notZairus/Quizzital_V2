@@ -1,10 +1,11 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { backendUrl, formatSeconds, processWord } from "../js/functions"; 
+import { backendUrl, formatSeconds, processWord, getClassroom } from "../js/functions"; 
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { AuthContext } from '../contexts/AuthContext';
+import { ClassroomContext } from '../contexts/ClassroomContext';
 import Toast from "./Toast";
 
 import check from '../assets/icons/check-svgrepo-com.svg'
@@ -13,6 +14,7 @@ import check from '../assets/icons/check-svgrepo-com.svg'
 export default function ActivityArea() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext)
+  const { insertClassroom } = useContext(ClassroomContext);
   const activityAreaRef = useRef(null);
 
 
@@ -96,6 +98,11 @@ export default function ActivityArea() {
   const reviewActivityFn = () => {
     setReviewActivity(true);
   }
+
+  const backToClass = useCallback(() => {
+    getClassroom(currentUser, insertClassroom)
+    backToClassroom();
+  }, [activityOver]);
 
 
 
@@ -248,7 +255,7 @@ export default function ActivityArea() {
           </div>
 
           <div className="h-20 mt-8 w-1/3 flex items-center justify-between">
-            <button onClick={backToClassroom} className="text-2xl border px-5 py-4 border-BackgroundColor_Darker bg-white text-BackgroundColor_Darker rounded hover:bg-BackgroundColor_Darker hover:text-white transition-all duration-300">
+            <button onClick={backToClass} className="text-2xl border px-5 py-4 border-BackgroundColor_Darker bg-white text-BackgroundColor_Darker rounded hover:bg-BackgroundColor_Darker hover:text-white transition-all duration-300">
               Back to Classroom
             </button>
             <button onClick={reviewActivityFn} className="text-2xl border px-5 py-4 border-BackgroundColor_Darker bg-white text-BackgroundColor_Darker rounded hover:bg-BackgroundColor_Darker hover:text-white transition-all duration-300">

@@ -92,7 +92,6 @@ export default function ProfessorClassroom() {
   }
   
   
-
   return (
     <div className="w-full grid grid-cols-3 gap-8 auto-rows-min">
       {

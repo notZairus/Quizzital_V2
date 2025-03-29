@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "../contexts/AuthContext";
 import { backendUrl } from "../js/functions";
 
-
 export default function UserRoles() {
   const navigate = useNavigate()
   const { currentUser, logout, login } = useContext(AuthContext);

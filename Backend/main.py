@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from sqlalchemy import text
 import os
 from configs import db, app, api
 
@@ -63,6 +64,27 @@ def get_role():
     db.session.commit()
 
     return jsonify(user.get_json())
+    
+
+@app.route('/classroom-request', methods=['PATCH', 'DELETE'])
+def classroom_request():
+    data = request.get_json()
+
+    if request.method == 'PATCH':
+        result = db.session.execute(text("""UPDATE classroom_user_tbl SET status='accepted' WHERE user_id = :u_id AND classroom_id = :c_id"""), {
+            "u_id": data['student_id'], 
+            "c_id": data['classroom_id']
+        })
+        db.session.commit()
+        return jsonify({'status': 200, 'message': 'successful!'})
+    
+    elif request.method == 'DELETE':
+        db.session.execute(text("""DELETE FROM classroom_user_tbl WHERE user_id = :u_id AND classroom_id = :c_id"""), {
+            "u_id": data['student_id'], 
+            "c_id": data['classroom_id']
+        })
+        db.session.commit()
+        return jsonify({'status': 200, 'message': 'successful!'})
 
 
 if __name__ == "__main__":
