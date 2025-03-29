@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 import { QuizContext } from "../../contexts/QuizContext";
+import ButtonLarge from '../../Components/ButtonLarge';
 
 
 
@@ -44,15 +45,14 @@ export default function Quizzes() {
 
   return (
     <>
-      <div className="flex items-start justify-between">
+      <div className="flex items-center justify-between mb-4">
         <Heading1>Questionnaire</Heading1>
         { currentUser.role == 'professor' && 
-          <button 
-            className="bg-BackgroundColor_Darker text-white px-4 py-2 rounded font-semibold shadow"
+          <ButtonLarge 
             onClick={() => navigate('/questionnaire/create')}
           >
             Create
-          </button> 
+          </ButtonLarge> 
         }
       </div>
       <div className="space-y-4">

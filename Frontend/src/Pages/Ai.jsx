@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 import Heading1 from "../Components/Heading1";
 import ButtonLarge from "../Components/ButtonLarge"
+import Button from "../Components/Button"
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Swal from 'sweetalert2';
 
@@ -66,7 +67,7 @@ export default function Ai() {
         </form>
         <div className="flex-1 bg-white flex flex-col relative border rounded">
           <div className="absolute right-8 top-4">
-            <ButtonLarge onClick={copyQuiz}>{generatedQuiz ? "Copied" : "Copy"}</ButtonLarge>
+            <Button onClick={copyQuiz}>{generatedQuiz ? "Copied" : "Copy"}</Button>
           </div>
           <textarea ref={outputTextAreaRef} readOnly={true} value={result} className="flex-1 resize-none p-4 py-3 text-xl outline-none rounded " />
         </div>

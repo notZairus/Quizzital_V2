@@ -107,9 +107,10 @@ export default function QuizCreate() {
 
     let quiz = await res1.json();
 
+
     const allQuestions = [...multipleChoiceQuestions, ...idenficationQuestions];
     allQuestions.forEach(async (question) => {
-      let res2 = await fetch(backendUrl('/question'), {
+      await fetch(backendUrl('/question'), {
         method: 'POST',
         headers: {
           'Content-type' : 'application/json'
@@ -131,7 +132,7 @@ export default function QuizCreate() {
       preConfirm: async () => {
         let res3 = await fetch(backendUrl(`/quiz?user_id=${currentUser.id}`));
         let newQuizzes = await res3.json();
-        setTimeout(2000);
+        console.log(newQuizzes);
         insertQuiz(newQuizzes);
 
         navigate('/questionnaire');

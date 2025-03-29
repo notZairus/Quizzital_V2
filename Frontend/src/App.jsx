@@ -10,6 +10,7 @@ const ClassroomShow = lazy(() => import('./Pages/classrooms/Show.jsx'));
 
 
 const ActivityArea = lazy(() => import('./Components/ActivityArea.jsx'))
+const ShowActivity = lazy(() => import('./Pages/classrooms/activity/Show.jsx'));
 
 
 const Quizzes = lazy(() => import('./Pages/quizzes/Quizzes.jsx'));
@@ -38,10 +39,12 @@ function App() {
           <Routes key={location.pathname}>
             
             <Route path="/" element={<AuthenticatedRoute><Layout /></AuthenticatedRoute>}>
-              
+            
               {/* Links of Classroom */}
               <Route path="/classroom" element={<Classrooms />} />
               <Route path="/classroom/:id" element={<ClassroomShow />} />
+
+              <Route path="/classroom/:classroom_id/activity/:activity_id/data" element={<ShowActivity />} />
 
               {/* Links of Questionnaire */}
               <Route path='/questionnaire' element={<ProfessorRoute><Quizzes /></ProfessorRoute>}/>

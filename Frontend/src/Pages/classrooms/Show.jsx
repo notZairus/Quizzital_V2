@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import { backendUrl } from "../../js/functions.js";
 import { getClassroom } from "../../js/functions.js";
 import Toast from "../../Components/Toast.js";
+import Button from '../../Components/Button.jsx';
 
 
 const ActivityPanel = lazy(() => import('../../Components/ActivityPanel.jsx'));
@@ -26,13 +27,14 @@ export default function ClassroomShow() {
   console.log(currentClassroom);
 
   function openActivity(_id) {
+
     isProf 
-      ? showActivity()
-      : answerActivity()
+    ? showActivity()
+    : answerActivity()
 
 
-    function showActivity() {
-      alert('show act');
+    async function showActivity() {
+      navigate(`/classroom/${currentClassroom.id}/activity/${_id}/data`)
     }
 
     async function answerActivity() {
@@ -143,7 +145,6 @@ export default function ClassroomShow() {
   }
 
 
-
   useEffect(() => {
     setCurrentClassroom(classrooms.find(classroom => classroom.id == id))
   }, [classrooms])
@@ -152,16 +153,18 @@ export default function ClassroomShow() {
     <>
       {isProf && <ActivityPanel show={showCreateActivityPanel} setShow={setShowCreateActivityPanel} classroom_id={id}/>}
         
-      <div className="flex justify-between items-start">
-        <Heading1>{currentClassroom.name} {isProf && <span className="text-gray-300">(Key: {currentClassroom.classroom_key})</span>}</Heading1>
-      </div>
+      <Heading1>
+        <div>
+          <span className="cursor-pointer" onClick={() => navigate('/classroom')}>Classroom &gt;</span> {currentClassroom.name} {isProf && <span className="text-gray-300">(Key: {currentClassroom.classroom_key})</span>}
+        </div>
+      </Heading1>
 
       {currentClassroom.description && <p className="mb-4">{currentClassroom.description}</p>}
       <hr className="mb-8"/>
       <div className="flex gap-4">
 
         {/* STUDENT DIV */}
-        {isProf && <div className="w-2/5 h-min bg-white px-4 rounded border py-4">
+        {isProf && <div className="w-2/5 h-min bg-white px-4 rounded border py-4 hover:shadow-lg  transition-all duration-300">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold">Students</h1>
             <p className="text-gray-400">Students enrolled: {currentClassroom.students.length}</p>
@@ -183,16 +186,15 @@ export default function ClassroomShow() {
         <div className="flex-1 space-y-2">
 
           {/* ACTIVITY DIV */}
-          <div className="flex-1 bg-white px-4 py-4 rounded border">
+          <div className="flex-1 bg-white px-4 py-4 rounded border hover:shadow-lg  transition-all duration-300">
             <div className="flex justify-between items-start">
               <h2 className="text-2xl font-semibold">Activities</h2>
               {isProf && 
-                <button 
-                  className="bg-BackgroundColor_Darker text-white px-4 py-2 rounded font-semibold shadow"
+                <Button 
                   onClick={() => setShowCreateActivityPanel(true)}
                 >
                   Create
-                </button>
+                </Button>
               }
             </div>
             <div className="grid gap-2 mt-4">
@@ -212,18 +214,17 @@ export default function ClassroomShow() {
 
           {/* LEARNING MATERIALS DIV */}
           {/* TO BE IMPLEMENTED */}
-          <div className="flex-1 bg-white px-4 py-4 rounded border">
+          <div className="flex-1 bg-white px-4 py-4 rounded border hover:shadow-lg  transition-all duration-300">
           <div className="flex justify-between items-start">
               <h2 className="text-2xl font-semibold">Materials</h2>
               {isProf && 
                 <>
                   <input type="file" ref={fileInputRef} className="hidden"/> 
-                  <button 
-                    className="bg-BackgroundColor_Darker text-white px-4 py-2 rounded font-semibold shadow"
+                  <Button 
                     onClick={handleFileUpload}
                   >
                     Create
-                  </button>
+                  </Button>
                 </>
               }
             </div>

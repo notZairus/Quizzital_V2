@@ -9,8 +9,9 @@ export default {
       colors: {
         BackgroundColor: '#F0F5F9',
         BackgroundColor_Darker: '#12B9D8',
+        BackgroundColor_Darkest: '#0EA2BE',
         White: '#FAFAFA',
-        TextColor: '#0C0C10'
+        TextColor: '#0C0C10',
       }
     },
   },

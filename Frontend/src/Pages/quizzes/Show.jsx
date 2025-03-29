@@ -194,10 +194,10 @@ export default function Show() {
   
   return (
     <>
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-center mb-4">
         <Heading1><div><span className="cursor-pointer" onClick={() => navigate('/questionnaire')}>Questionnaire &gt;</span> {currentQuiz.name}</div></Heading1>
         <button 
-          className="bg-red-500 text-white px-4 py-2 rounded font-semibold shadow"
+          className="bg-red-500 text-lg px-6 py-3 text-white rounded font-semibold shadow"
           onClick={deleteQuiz}
         >
           Delete
