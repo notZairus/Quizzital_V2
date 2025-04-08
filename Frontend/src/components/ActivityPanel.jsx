@@ -28,6 +28,7 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
 
 
   async function createActivity() {
+
     if (newActivity.name === "" || newActivity.name.length <= "2") {
       Swal.fire({
         'icon': 'error',
@@ -46,6 +47,20 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
       return;
     }
 
+    if (newActivity.open_at) {
+      let open = new Date(newActivity.open_at).getTime();
+      let now = new Date().getTime()
+
+      if (now > open) {
+        Swal.fire({
+          'icon': 'error',
+          'title': 'Invalid Open Time',
+          'text': 'Opening time should never be earlier than the current date/time'
+        })
+        return;
+      }
+    }
+
     if (newActivity.close_at) {
       let open = new Date(newActivity.open_at).getTime();
       let close = new Date(newActivity.close_at).getTime();
@@ -60,12 +75,30 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
       }
     }
 
+    if (newActivity.timer !== null) {
+      console.log(newActivity.timer);
+      console.log(newActivity.timer <= 0)
+      if (newActivity.timer <= 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Timer',
+          text: 'Timer can\'t be a negative number.'
+        })
+        return;
+      }
+    }
+
     await fetch(backendUrl('/activity'), {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
       },
-      body: JSON.stringify({...newActivity, timer: newActivity.timer * 60})
+      body: JSON.stringify({
+        ...newActivity, 
+        timer: newActivity.timer * 60, 
+        open_at: new Date(newActivity.open_at).toLocaleString(), 
+        close_at: newActivity.close_at == null ? null : new Date(newActivity.close_at).toLocaleString()
+      })
     })
 
     Toast("success", "Activity created!", 1000);

@@ -5,6 +5,7 @@ from typing import Optional
 from datetime import datetime
 from Models.activity_model import Activity
 from configs import db
+from sqlalchemy import text
 
 
 class post_activity_validator(BaseModel):
@@ -12,8 +13,8 @@ class post_activity_validator(BaseModel):
   quiz_id: int
   name: str
   perfect_score: int
-  open_at: datetime
-  close_at: Optional[datetime] = None
+  open_at: str
+  close_at: Optional[str] = None
   timer: Optional[int] = None
 
 
@@ -30,3 +31,23 @@ class ActivityResource(Resource):
 
     except ValidationError as e:
       abort(404, message=e.errors())
+
+  def get(self):
+    user_id = request.args.get('user_id');
+
+    result = db.session.execute(text("""
+      SELECT activity.*, classroom.name FROM activity
+      JOIN classroom ON activity.classroom_id = classroom.id
+      JOIN classroom_user_tbl ON classroom.id = classroom_user_tbl.classroom_id
+      WHERE classroom_user_tbl.user_id = :user_id
+    """), {
+      "user_id": user_id
+    }).fetchall()
+
+    activities = []
+    for i in range(len(result)):
+      activities.append(Activity.query.filter_by(id=result[i].id).first().to_json())
+
+    return jsonify({
+      "activities": activities
+    });

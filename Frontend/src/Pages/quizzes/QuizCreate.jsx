@@ -1,12 +1,12 @@
 import Heading1 from "../../Components/Heading1";
 import Swal from 'sweetalert2';
 import { useContext, useRef, useState } from "react";
-import { backendUrl } from '../../js/functions';
+import { backendUrl, mainColor } from '../../js/functions';
 import ButtonLarge from '../../Components/ButtonLarge';
 import { AuthContext } from '../../contexts/AuthContext';
 import { QuizContext } from '../../contexts/QuizContext';
 import { useNavigate } from "react-router-dom";
-
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default function QuizCreate() {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ export default function QuizCreate() {
   const [ multipleChoiceQuestions, setMultipleChoiceQuestions ] = useState([]);
   const [ idenficationQuestions, setIdenficationQuestions ] = useState([]);
   const quiz_name_ref = useRef(null);
-  console.log(currentUser)
 
   async function createQuiz() {
 
@@ -140,15 +139,77 @@ export default function QuizCreate() {
     })
   }
 
-
   function showAi() {
     Swal.fire({
       title: 'Ai',
       html: `
-          <textarea class="w-full h-80 border-2 border-black/20 resize-none p-4"> </textarea>
+          <textarea id="text_area" class="w-full h-80 border-2 border-black/20 resize-none p-4"> </textarea>
+          <div class="flex flex-col gap-2 items-start mt-4">
+            <label for="q_count">
+              Number of Questions: 
+              <input id="q_count" type="number" max="50" min="5" step="1" class="w-12 border ml-2" required/>
+            </label>
+          </div>
       `,
-      confirmButtonText: 'Extract Questions'
+      confirmButtonText: 'Extract Questions',
+      confirmButtonColor: mainColor,
+      showCancelButton: true,
+      allowOutsideClick: false,
+      preConfirm: async () => {
+        let lesson = document.getElementById('text_area').value;
+        let question_count = document.getElementById('q_count').value;
+
+        if (lesson.length < 20) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Lesson",
+            text: "Please provide a lesson with atleast 1 paragpraph."
+          });
+          return;
+        }
+        
+        if (!question_count) {
+          Swal.fire({
+            icon: "error",
+            title: "Missing Question Count",
+            text: "Please enter a valid number of questions."
+          });
+          return;
+        }
+
+        try {
+          let result = await generateQuestionnaire(lesson, question_count);
+          let questionString = result.slice(result.indexOf('['), result.lastIndexOf(']') + 1)
+          let questions = JSON.parse(questionString);
+
+          setMultipleChoiceQuestions([...multipleChoiceQuestions, ...questions.filter(q => q.type === "multiple_choice")])
+          setIdenficationQuestions([...idenficationQuestions, ...questions.filter(q => q.type === "identification")])
+          
+        } catch(error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid Input.'
+          })
+        }
+      }
     })
+
+    async function generateQuestionnaire(lesson, question_count) {
+      const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.0-flash" ,
+        systemInstruction: `
+            You are an instructor, extract ${question_count} an equal number of multiple choice and identification questions with answer out of the text that will be provided by the user. 
+            if the question type is multiplications, your response should be in a JSON with a structure of 
+              [{question: "the question", choices: ["choice a", "choice b", "choice c"], answer: "the answer", type: "multiple_choice"}] //IMPORTANT NOTE: the answer should not be included in the choices should pnly be an array of wrong answers
+            if the question type is identification, your response should be in a JSON with a structure of 
+              [{question: "the question", answer: "the answer", type: "identification"}]
+          .`
+      });
+
+      const response = await model.generateContent(lesson);
+      return response.response.text();
+    }
   }
 
   function addMultipleChoiceQuestion() {
@@ -161,7 +222,10 @@ export default function QuizCreate() {
 
   return (
     <>
-      <Heading1>Create Questionnaire</Heading1>
+      <div className="flex justify-between items-center">
+        <Heading1>Create Questionnaire</Heading1>
+        <ButtonLarge onClick={showAi}>Generate with AI</ButtonLarge>
+      </div>
 
       <div className="my-12">
         <p className="text-xl mb-2">Questionnaire Name: </p>

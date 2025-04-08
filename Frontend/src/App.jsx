@@ -12,21 +12,22 @@ const ClassroomShow = lazy(() => import('./Pages/classrooms/Show.jsx'));
 const ActivityArea = lazy(() => import('./Components/ActivityArea.jsx'))
 const ShowActivity = lazy(() => import('./Pages/classrooms/activity/Show.jsx'));
 
-
 const Quizzes = lazy(() => import('./Pages/quizzes/Quizzes.jsx'));
 const QuizShow = lazy(() => import('./Pages/quizzes/Show.jsx'));
 
+const Activities = lazy(() => import('./Pages/activity/Index.jsx'));
 
 const Layout = lazy(() => import('./Layout.jsx'));
 const AuthenticatedRoute = lazy(() => import('./Components/AuthenticatedRoute.jsx'))
 const UnauthenticatedRoute = lazy(() => import('./Components/UnauthenticatedRoute.jsx'))
 const UserRoles = lazy(() => import('./Components/UserRoles.jsx'))
 
+const AccountSettings = lazy(() => import('./Pages/account/AccountSettings.jsx'))
+
 
 // Auth
 const Login = lazy(() => import('./Pages/auth/Login.jsx'));
 const Register = lazy(() => import('./Pages/auth/Register.jsx'))
-const Ai = lazy(() => import('./Pages/Ai.jsx'))
 
 
 function App() {
@@ -51,7 +52,11 @@ function App() {
               {currentUser && currentUser.role === "professor" && <Route path="/questionnaire/:id" element={<QuizShow />} />}
               <Route path='/questionnaire/create' element={<QuizCreate />}/>
 
-              <Route path='/ai' element={<Ai />}/>
+
+              <Route path='/activity' element={<Activities />}/>
+
+              
+              <Route path="/my-account" element={<AccountSettings />} />
 
             </Route>
             

@@ -9,7 +9,7 @@ import { backendUrl } from "../../js/functions.js";
 import { getClassroom } from "../../js/functions.js";
 import Toast from "../../Components/Toast.js";
 import Button from '../../Components/Button.jsx';
-
+import plus_icon from '../../assets/icons/plus-svgrepo-com.svg'
 
 const ActivityPanel = lazy(() => import('../../Components/ActivityPanel.jsx'));
 
@@ -17,14 +17,12 @@ const ActivityPanel = lazy(() => import('../../Components/ActivityPanel.jsx'));
 export default function ClassroomShow() {
   const { id } = useParams();
   const { currentUser } = useContext(AuthContext);
-  const { classrooms, insertClassroom } = useContext(ClassroomContext);
+  const { classrooms, insertClassroom, refreshClassroom } = useContext(ClassroomContext);
   const [currentClassroom, setCurrentClassroom] = useState(classrooms.find(classroom => classroom.id == id));
   const navigate = useNavigate();
   const [showCreateActivityPanel, setShowCreateActivityPanel] = useState(false);
   const [isProf, setIsProf] = useState(currentUser.role == 'professor')
   const fileInputRef = useRef(null);
-
-  console.log(currentClassroom);
 
   function openActivity(_id) {
 
@@ -39,17 +37,57 @@ export default function ClassroomShow() {
 
     async function answerActivity() {
       let currentActivity = currentClassroom.activities.find(act => act.id == _id);
-      let students_who_already_answered = currentActivity.records.map((r) => r.user_id);
 
+      let students_who_already_answered = currentActivity.records.map((r) => r.user_id);
       if (students_who_already_answered.includes(currentUser.id)) {
         Swal.fire({
           icon: 'error',
-          title: 'Forbidden',
-          text: 'You have already taken this activity.'
-        })
+          title: 'Access Denied',
+          html: `
+            <p>You’ve already submitted this activity.</p>
+            <p><b>Multiple attempts are not allowed.</b></p>
+          `,
+          confirmButtonText: 'Okay',
+          footer: 'Please contact your instructor if you think this is a mistake.',
+          allowOutsideClick: false
+        });
         return;
       }
 
+      let timeNow = new Date();
+      let openTime = new Date(currentActivity.open_at);
+      let closeTime = new Date(currentActivity.close_at);
+
+      if (timeNow.getTime() < openTime.getTime()) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Activity Not Yet Started',
+          html: `
+            <p>The activity will be open starting:</p>
+            <b>${openTime.toLocaleString()}</b>
+          `,
+          confirmButtonText: 'Okay',
+          footer: 'Please come back once it opens.',
+          allowOutsideClick: false
+        });
+        return;
+      }
+
+      if (timeNow.getTime() > closeTime.getTime()) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Activity Closed',
+          html: `
+            <p>Sorry, this activity closed on:</p>
+            <b>${closeTime.toLocaleString()}</b>
+          `,
+          confirmButtonText: 'Got it',
+          footer: 'You can no longer participate in this activity.',
+          allowOutsideClick: false
+        });
+        return;
+      }
+      
       localStorage.setItem('activity', JSON.stringify(currentActivity));
       localStorage.setItem('currentClassroom', JSON.stringify(currentClassroom));
       navigate('/activity-area');
@@ -144,10 +182,59 @@ export default function ClassroomShow() {
     }
   }
 
+  async function kickStudent(student_id) {
+    let student = currentClassroom.students.find(s => s.id === student_id);
+
+    // to be implemented
+    Swal.fire({
+      icon: 'warning',
+      title: `Kick ${student.first_name}?`,
+      text: "Are you sure you want to remove this student?",
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, kick!',
+      cancelButtonText: 'Cancel'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        
+        await fetch(backendUrl('/classroom-request'), {
+          method: 'DELETE',
+          headers: {
+            'Content-type' : 'application/json'
+          },
+          body: JSON.stringify({
+            'student_id': student_id,
+            'classroom_id': currentClassroom.id
+          })
+        })
+
+        // await fetch(backendUrl('/activity-record'), {
+        //   method: 'DELETE',
+        //   headers: {
+        //     'Content-type' : 'application/json'
+        //   },
+        //   body: JSON.stringify({
+        //     'user_id': student_id,
+        //     'classroom_id': currentClassroom.id
+        //   })
+        // })
+
+        await refreshClassroom()
+        Swal.fire('Kicked!', `${student.first_name} has been removed.`, 'success');
+      }
+    });
+
+    return
+
+
+  }
+
 
   useEffect(() => {
     setCurrentClassroom(classrooms.find(classroom => classroom.id == id))
   }, [classrooms])
+
 
   return (
     <>
@@ -167,17 +254,24 @@ export default function ClassroomShow() {
         {isProf && <div className="w-2/5 h-min bg-white px-4 rounded border py-4 hover:shadow-lg  transition-all duration-300">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold">Students</h1>
-            <p className="text-gray-400">Students enrolled: {currentClassroom.students.length}</p>
+            <p className="text-gray-400">Students enrolled: {currentClassroom.students.filter(s => s.status === "accepted").length}</p>
           </div>
           <div className="text-black mt-4 space-y-2">
             {
               currentClassroom.students.map((student, index) => (
                 <div key={student.id} className="w-full border p-4 rounded flex justify-between">
                   <p>{student.first_name} {student.last_name}</p>
-                  {student.status === 'pending' && <div className="flex gap-4">
-                    <button onClick={() => acceptRequest(student.id)}className="text-blue-400 hover:text-blue-600">Accept</button>
-                    <button onClick={() => declineRequest(student.id)} className="text-red-400 hover:text-red-600">Decline</button>
-                  </div>}
+                  {student.status === 'pending' 
+                  ? 
+                    <div className="flex gap-4">
+                      <button onClick={() => acceptRequest(student.id)}className="text-blue-400 hover:text-blue-600">Accept</button>
+                      <button onClick={() => declineRequest(student.id)} className="text-red-400 hover:text-red-600">Decline</button>
+                    </div>
+                  :
+                    <div className="flex gap-4">
+                      <button onClick={() => kickStudent(student.id)} className="text-red-400 hover:text-red-600">Kick</button>
+                    </div>
+                  }
                 </div>
               ))
             }
@@ -193,7 +287,10 @@ export default function ClassroomShow() {
                 <Button 
                   onClick={() => setShowCreateActivityPanel(true)}
                 >
-                  Create
+                  <div className="w-6">
+                    <img src={plus_icon} alt="+" />
+                  </div>
+                  <span className="font-semibold">Create</span>
                 </Button>
               }
             </div>
@@ -223,7 +320,10 @@ export default function ClassroomShow() {
                   <Button 
                     onClick={handleFileUpload}
                   >
-                    Create
+                    <div className="w-6">
+                      <img src={plus_icon} alt="+" />
+                    </div>
+                    <span className="font-semibold">Create</span>
                   </Button>
                 </>
               }

@@ -1,8 +1,11 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
+import { backendUrl } from "../js/functions";
 
 export const ClassroomContext = createContext();
 
 export function ClassroomProvider({ children }) {
+  const { currentUser } = useContext(AuthContext);
   const [classrooms, setClassrooms] = useState([]);
 
   useEffect(() => {
@@ -17,8 +20,24 @@ export function ClassroomProvider({ children }) {
     setClassrooms(_classrooms);
   }
 
+  async function refreshClassroom() {
+    let response = await fetch(backendUrl('/get_classrooms'), {
+      method: 'POST',
+      headers: {
+        'Content-type' : 'application/json'
+      },
+      body: JSON.stringify({
+        'user_id': currentUser.id,
+        'role': currentUser.role
+      })
+    })
+
+    let result = await response.json()
+    insertClassroom(result);
+  }
+
   return (
-    <ClassroomContext.Provider value={{classrooms, insertClassroom}}>
+    <ClassroomContext.Provider value={{classrooms, insertClassroom, refreshClassroom}}>
       { children }
     </ClassroomContext.Provider>
   )

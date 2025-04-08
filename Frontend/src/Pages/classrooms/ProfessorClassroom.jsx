@@ -96,7 +96,7 @@ export default function ProfessorClassroom() {
     <div className="w-full grid grid-cols-3 gap-8 auto-rows-min">
       {
         classrooms.map(classroom => (
-          <div onClick={() => navigate(`/classroom/${classroom.id}`)} key={classroom.classroom_key} className="bg-white relative cursor-pointer rounded-3xl border flex items-center justify-center h-64 overflow-hidden shadow-md">
+          <div onClick={() => navigate(`/classroom/${classroom.id}`)} key={classroom.classroom_key} className="bg-white relative cursor-pointer rounded-3xl border flex items-center justify-center h-64 overflow-hidden shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300">
             <img src={classroom.img_url} alt="" className="w-full h-full bg-red-400"/>
             <div className="absolute z-0 bottom-0 w-full h-20 p-2 px-4 overflow-hidden shadow bg-white">
               <p className="text-2xl font-semibold">{classroom.name}</p>

@@ -22,8 +22,8 @@ export default function ActivityArea() {
 
   const [currentClassroom, setCurrentClassroom] = useState(JSON.parse(localStorage.getItem('currentClassroom')));
   const [activity, setActivity] = useState(JSON.parse(localStorage.getItem('activity')));
-  // const [timer, setTimer] = useState(activity.timer);
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(activity.timer);
+  //const [timer, setTimer] = useState(20);
   const [activityStarted, setActivityStarted] = useState(false);
   const [activityOver, setActivityOver] = useState(false);
   const [reviewActivity, setReviewActivity] = useState(false);
@@ -230,7 +230,7 @@ export default function ActivityArea() {
 
               <p className="text-6xl font-thin mt-12">
                 {
-                  Math.round(questions.length * 0.7 / questions.length * activity.perfect_score) <= Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score) 
+                  Math.round(0.7 * activity.perfect_score) <= Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score) 
                   ? "Passed!"
                   : "Failed!"
                 }
@@ -338,21 +338,23 @@ export default function ActivityArea() {
           {!reviewActivity && <div className="mb-8 w-full py-8 bg-white rounded shadow text-4xl items-center justify-center flex">
               {formatSeconds(timer)}
           </div>}
-          <div className="space-y-2 bg-white p-2 rounded shadow">
-            {questions.map((question) => (
-              <div 
-                className={`
-                  ${question.question === currentQuestion.question ? "bg-BackgroundColor_Darker/15" : "bg-slate-50"}
-                  w-full min-h-12 rounded flex items-center px-4 py-2 justify-between`
-              }
-                key={question.id}
-                onClick={() => { setCurrentQuestion(questions.find((q) => q.id == question.id)) }}
-              >
-                <p className="flex-1">{question.question}</p>
-                <div className={`${question._answer && "bg-BackgroundColor_Darker"} w-4 rounded-full aspect-square `}></div>
-              </div>
-            )
-          )}  
+          <div className="max-h-[500px] shadow bg-white px-2 py-4 overflow-auto rounded">
+            <div className="space-y-2">
+              {questions.map((question) => (
+                <div 
+                  className={`
+                    ${question.question === currentQuestion.question ? "bg-BackgroundColor_Darker/15" : "bg-slate-50"}
+                    w-full min-h-12 rounded flex items-center px-4 py-2 justify-between`
+                }
+                  key={question.id}
+                  onClick={() => { setCurrentQuestion(questions.find((q) => q.id == question.id)) }}
+                >
+                  <p className="flex-1">{question.question}</p>
+                  <div className={`${question._answer && "bg-BackgroundColor_Darker"} w-4 rounded-full aspect-square `}></div>
+                </div>
+              )
+            )}  
+            </div>
           </div>
         </div>
       </div>}
