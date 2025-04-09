@@ -6,7 +6,7 @@ from .question_model import Question
 class Answer(db.Model):
   id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-  question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
+  question_id = db.Column(db.Integer, db.ForeignKey('question.id', ondelete="SET NULL"), nullable=True)
   student_answer = db.Column(db.String(255), nullable=False)
   correct = db.Column(db.Boolean, nullable=False)
   created_at = db.Column(db.DateTime, default=datetime.now())

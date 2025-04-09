@@ -18,12 +18,12 @@ export default function ShowActivity() {
   const { classrooms } = useContext(ClassroomContext);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-
   useEffect(() => {
     let currentClassroom = classrooms.find(c => c.id == parameters.classroom_id);
     setActivity(currentClassroom.activities.find(act => act.id == parameters.activity_id));
     setClassroom({...currentClassroom, students: currentClassroom.students.filter(s => s.status === "accepted")});
-  }, []);
+  }, [classrooms, parameters]);
+  
 
   async function notifyStudent(student) {
     let res = await fetch(backendUrl('/send-notification'), {
@@ -42,7 +42,6 @@ export default function ShowActivity() {
       Toast('success', 'Email sent successfully!')
     }
   }
-
 
   function Graph1() {
     if (!activity) return;
@@ -87,7 +86,7 @@ export default function ShowActivity() {
 
     const labels = [];
     for(let i = 0; i < activity.quiz.questions.length + 1; i++) {
-      labels.push((i) / activity.quiz.questions.length * 100);
+      labels.push(Math.round(i / activity.quiz.questions.length * 100));
     }
 
     let scores = labels.map((l) => 0);
@@ -224,7 +223,7 @@ export default function ShowActivity() {
     }
 
     let studentRecord = activity.records.find(r => r.user_id == selectedStudent.id);
-    let numberOfCorrects = studentRecord.user_score / activity.perfect_score * activity.quiz.questions.length;
+    let numberOfCorrects = Math.round(studentRecord.user_score / activity.perfect_score * activity.quiz.questions.length);
 
 
     return (
@@ -273,15 +272,20 @@ export default function ShowActivity() {
         </div>
         
         <div className="w-full h-full bg-white col-span-2 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
-          {Graph1()}
+          { Graph1() }
         </div>
 
         <div className="w-full h-full bg-white col-span-5 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
-          {Graph2()}
+          {activity?.quiz 
+            ? Graph2()
+            : <div className="w-full h-full flex items-center justify-center">
+                <p className="text-3xl text-gray-500">No Questions to Evaluate</p>
+              </div>
+          }
         </div>
 
         <div className="w-full h-full bg-white col-span-2 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
-          {Graph3()}
+          { Graph3() }
         </div>
 
         <div className="w-full text-4xl flex items-center justify-center col-span-full h-20 bg-white shadow rounded-xl">
@@ -291,11 +295,16 @@ export default function ShowActivity() {
         </div>
 
         <div className="w-full h-96 bg-white col-span-4 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
-          {studentList()}
+          { studentList() }
         </div>
 
         <div className="w-full bg-white col-span-5 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
-          {Graph5()}
+          {activity?.quiz 
+            ? Graph5()
+            : <div className="w-full h-full flex items-center justify-center">
+                <p className="text-3xl text-gray-500">No Questions to Evaluate</p>
+              </div>
+          }
         </div>
 
       </div>

@@ -12,8 +12,7 @@ import Swal from 'sweetalert2';
 export default function ActivityPanel({ show, setShow, classroom_id }) {
   const navigate = useNavigate()
   const { quizzes } = useContext(QuizContext);
-  const { currentUser } = useContext(AuthContext);
-  const { insertClassroom } = useContext(ClassroomContext);
+  const { refreshClassroom } = useContext(ClassroomContext);
   const [hasTimer, setHasTimer] = useState(false);
 
   const [newActivity, setNewActivity] = useState({
@@ -25,7 +24,6 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
     "close_at": null,
     "timer": null
   })
-
 
   async function createActivity() {
 
@@ -102,8 +100,8 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
     })
 
     Toast("success", "Activity created!", 1000);
-    await getClassroom(currentUser, insertClassroom)
-    setShow(false)
+    refreshClassroom();
+    setShow(false);
 
     setTimeout(async () => {
       navigate(0);

@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Question(db.Model):
   id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
-  quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+  quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id', ondelete="CASCADE"), nullable=False)
   question = db.Column(db.String(255), nullable=False)
   type = db.Column(db.String(20), nullable=False)
   choices = db.Column(db.JSON)

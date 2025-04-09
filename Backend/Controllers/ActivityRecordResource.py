@@ -13,6 +13,7 @@ class post_activity_record_validator(BaseModel):
   user_id: int
   activity_id: int
   user_score: int
+  perfect_score: int
   remarks: str
 
 

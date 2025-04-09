@@ -20,20 +20,24 @@ export function ClassroomProvider({ children }) {
     setClassrooms(_classrooms);
   }
 
-  async function refreshClassroom() {
-    let response = await fetch(backendUrl('/get_classrooms'), {
-      method: 'POST',
-      headers: {
-        'Content-type' : 'application/json'
-      },
-      body: JSON.stringify({
-        'user_id': currentUser.id,
-        'role': currentUser.role
+  function refreshClassroom() {
+    let fetchClassroom = async () => {
+      let response = await fetch(backendUrl('/get_classrooms'), {
+        method: 'POST',
+        headers: {
+          'Content-type' : 'application/json'
+        },
+        body: JSON.stringify({
+          'user_id': currentUser.id,
+          'role': currentUser.role
+        })
       })
-    })
+  
+      let result = await response.json()
+      insertClassroom(result);
+    }
 
-    let result = await response.json()
-    insertClassroom(result);
+    fetchClassroom();
   }
 
   return (

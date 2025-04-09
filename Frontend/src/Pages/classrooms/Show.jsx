@@ -6,7 +6,6 @@ import { ClassroomContext } from "../../contexts/ClassroomContext.jsx";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
 import Swal from "sweetalert2";
 import { backendUrl } from "../../js/functions.js";
-import { getClassroom } from "../../js/functions.js";
 import Toast from "../../Components/Toast.js";
 import Button from '../../Components/Button.jsx';
 import plus_icon from '../../assets/icons/plus-svgrepo-com.svg'
@@ -21,17 +20,28 @@ export default function ClassroomShow() {
   const [currentClassroom, setCurrentClassroom] = useState(classrooms.find(classroom => classroom.id == id));
   const navigate = useNavigate();
   const [showCreateActivityPanel, setShowCreateActivityPanel] = useState(false);
-  const [isProf, setIsProf] = useState(currentUser.role == 'professor')
+  const [isProf, setIsProf] = useState(currentUser.role == 'professor');
   const fileInputRef = useRef(null);
+  const [activityRecords, setActivityRecords] = useState(null);
+
 
   function openActivity(_id) {
-
     isProf 
     ? showActivity()
     : answerActivity()
 
-
     async function showActivity() {
+      let activity = currentClassroom.activities.find(act => act.id === _id)
+
+      // if (!activity.quiz) {
+      //   Swal.fire({
+      //     icon: 'info',
+      //     title: "This Activity has no assigned Questionnaire",
+      //     text: 'Please assign a questionnaire'
+      //   })
+      //   return;
+      // }
+
       navigate(`/classroom/${currentClassroom.id}/activity/${_id}/data`)
     }
 
@@ -56,7 +66,7 @@ export default function ClassroomShow() {
 
       let timeNow = new Date();
       let openTime = new Date(currentActivity.open_at);
-      let closeTime = new Date(currentActivity.close_at);
+      let closeTime = currentActivity.close_at ? new Date(currentActivity.close_at) : null;
 
       if (timeNow.getTime() < openTime.getTime()) {
         Swal.fire({
@@ -73,7 +83,7 @@ export default function ClassroomShow() {
         return;
       }
 
-      if (timeNow.getTime() > closeTime.getTime()) {
+      if (closeTime && timeNow.getTime() > closeTime.getTime()) {
         Swal.fire({
           icon: 'warning',
           title: 'Activity Closed',
@@ -132,7 +142,7 @@ export default function ClassroomShow() {
         })
       })
       
-      getClassroom(currentUser, insertClassroom)
+      refreshClassroom();
       Toast("success", "Activity created!", 1000);
 
     } catch (error) {
@@ -220,20 +230,74 @@ export default function ClassroomShow() {
         //   })
         // })
 
-        await refreshClassroom()
+        refreshClassroom();
         Swal.fire('Kicked!', `${student.first_name} has been removed.`, 'success');
       }
     });
 
-    return
-
-
+    return;
   }
 
 
   useEffect(() => {
     setCurrentClassroom(classrooms.find(classroom => classroom.id == id))
   }, [classrooms])
+
+  useEffect(() => {
+    if (!currentClassroom) return;
+
+    let allRecords = {};
+
+    currentClassroom.students.forEach(std => {
+      allRecords[`${std.last_name} ${std.first_name}`] = [`${std.last_name} ${std.first_name}`];
+      currentClassroom.activities.forEach(act => {
+        let student_record = act.records.find(_record => _record.user_id === std.id)
+        allRecords[`${std.last_name} ${std.first_name}`].push(student_record ? student_record.user_score: 0);
+      })
+    })
+
+    setActivityRecords(allRecords);
+  }, [currentClassroom, classrooms]);
+
+
+  function recordTable() {
+    if (!activityRecords) return;
+
+    let records = Object.values(activityRecords);
+
+    return (
+      <>
+        <h2 className="text-2xl font-semibold text-center">Student Records</h2>
+        <div class="overflow-x-auto rounded-lg mt-4">
+          <table class="min-w-full table-auto bg-white border-collapse text-gray-700">
+            <thead class="bg-BackgroundColor_Darker text-white">
+              <tr>
+                <th class="px-6 py-3 text-center uppercase font-semibold">Student Name</th>
+                {
+                  currentClassroom.activities.map(act => (
+                    <th class="px-6 py-3 uppercase font-semibold text-center">{act.name} ({act.perfect_score}%)</th>
+                  ))
+                }
+              </tr>
+            </thead>
+            <tbody>
+              {records.map((rec => (
+                <tr class="border-b  hover:bg-BackgroundColor hover:text-black transition-all duration-300">
+                  {
+                    rec.map(data => (
+                      <td class="px-6 py-4 text-lg text-center">{data.length >= 3 ? data : `${data}%`}</td>
+                    ))
+                  }
+                </tr>
+              )))}
+            </tbody>
+          </table>
+        </div>
+      </>
+    )
+  }
+
+  
 
 
   return (
@@ -246,7 +310,7 @@ export default function ClassroomShow() {
         </div>
       </Heading1>
 
-      {currentClassroom.description && <p className="mb-4">{currentClassroom.description}</p>}
+      {currentClassroom.description && <p onClick={recordTable} className="mb-4">{currentClassroom.description}</p>}
       <hr className="mb-8"/>
       <div className="flex gap-4">
 
@@ -312,7 +376,7 @@ export default function ClassroomShow() {
           {/* LEARNING MATERIALS DIV */}
           {/* TO BE IMPLEMENTED */}
           <div className="flex-1 bg-white px-4 py-4 rounded border hover:shadow-lg  transition-all duration-300">
-          <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start">
               <h2 className="text-2xl font-semibold">Materials</h2>
               {isProf && 
                 <>
@@ -344,6 +408,10 @@ export default function ClassroomShow() {
             </div>
           </div>  
         </div>
+
+      </div>
+      <div className="w-full mt-8 bg-white px-4 rounded border py-4 hover:shadow-lg  transition-all duration-300 flex flex-col">
+        { recordTable() }
       </div>
     </>
   )

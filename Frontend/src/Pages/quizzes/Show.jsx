@@ -8,12 +8,14 @@ import Swal from 'sweetalert2';
 import { getQuizzes } from "../../js/functions.js";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
 import { nanoid } from "nanoid";
+import { ClassroomContext } from "../../contexts/ClassroomContext.jsx";
 
 
 export default function Show() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
   const { insertQuiz } = useContext(QuizContext);
+  const { refreshClassroom } = useContext(ClassroomContext);
   const { id } = useParams(); 
   const { quizzes } = useContext(QuizContext);
   const quiz_name_ref = useRef(null);
@@ -29,7 +31,7 @@ export default function Show() {
       showCancelButton: true,
       confirmButtonText: 'Confirm',
       preConfirm: async () => {
-        await fetch(backendUrl('/quiz'), {
+        let res = await fetch(backendUrl('/quiz'), {
           method: 'DELETE',
           headers: {
             'Content-type': 'application/json'
@@ -39,11 +41,18 @@ export default function Show() {
           })
         })
 
+        if (!res.ok) {
+          Swal.fire({
+            title: 'Unknown Error!'
+          })
+        }
+
         Swal.fire({
           'title': 'Success',
           'icon': 'success',
           'text': 'Quiz updated successfully!',
           preConfirm: async () => {
+            refreshClassroom()
             await getQuizzes(currentUser, insertQuiz);
             navigate(`/questionnaire`)
           }
@@ -53,7 +62,6 @@ export default function Show() {
   }
 
   async function updateQuiz() {
-
     let multipleChoiceQuestions = currentQuiz.questions.filter(q => q.type === "multiple_choice")
     let idenficationQuestions = currentQuiz.questions.filter(q => q.type === "identification")
     let invalid = false;

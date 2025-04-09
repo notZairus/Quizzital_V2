@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { backendUrl, formatSeconds, processWord, getClassroom } from "../js/functions"; 
+import { backendUrl, formatSeconds, processWord } from "../js/functions"; 
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { AuthContext } from '../contexts/AuthContext';
@@ -14,7 +14,7 @@ import check from '../assets/icons/check-svgrepo-com.svg'
 export default function ActivityArea() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext)
-  const { insertClassroom } = useContext(ClassroomContext);
+  const { refreshClassroom } = useContext(ClassroomContext);
   const activityAreaRef = useRef(null);
 
 
@@ -100,7 +100,7 @@ export default function ActivityArea() {
   }
 
   const backToClass = useCallback(() => {
-    getClassroom(currentUser, insertClassroom)
+    refreshClassroom();
     backToClassroom();
   }, [activityOver]);
 
@@ -176,7 +176,8 @@ export default function ActivityArea() {
         'remarks': Math.round(questions.length * 0.7 / questions.length * activity.perfect_score) <= Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score) 
                   ? "Passed!"
                   : "Failed!",
-        'user_score': Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score)
+        'user_score': Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score),
+        'perfect_score': activity.perfect_score
       }
 
       await fetch(backendUrl('/activity-record'), {
