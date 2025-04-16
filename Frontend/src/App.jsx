@@ -11,6 +11,7 @@ const ClassroomShow = lazy(() => import('./Pages/classrooms/Show.jsx'));
 
 const ActivityArea = lazy(() => import('./Components/ActivityArea.jsx'))
 const ShowActivity = lazy(() => import('./Pages/classrooms/activity/Show.jsx'));
+const ActivityReview = lazy(() => import('./Components/ActivityReview.jsx'));
 
 const Quizzes = lazy(() => import('./Pages/quizzes/Quizzes.jsx'));
 const QuizShow = lazy(() => import('./Pages/quizzes/Show.jsx'));
@@ -69,6 +70,8 @@ function App() {
 
             {/* Activity Area */}
             <Route path="/activity-area" element={<ActivityArea />} />
+
+            <Route path="/activity/:id/review" element={<ActivityReview />} />
 
           </Routes>
         </Suspense>

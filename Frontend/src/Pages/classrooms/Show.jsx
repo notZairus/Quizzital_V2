@@ -5,7 +5,7 @@ import { useContext, useRef, useState, useEffect, lazy } from "react";
 import { ClassroomContext } from "../../contexts/ClassroomContext.jsx";
 import { AuthContext } from "../../contexts/AuthContext.jsx";
 import Swal from "sweetalert2";
-import { backendUrl } from "../../js/functions.js";
+import { backendUrl, formatSeconds } from "../../js/functions.js";
 import Toast from "../../Components/Toast.js";
 import Button from '../../Components/Button.jsx';
 import plus_icon from '../../assets/icons/plus-svgrepo-com.svg'
@@ -48,18 +48,53 @@ export default function ClassroomShow() {
     async function answerActivity() {
       let currentActivity = currentClassroom.activities.find(act => act.id == _id);
 
+      if (!currentActivity.quiz) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Access Denied',
+          text: 'The questionnaire for this quiz was deleted.',
+          footer: 'Wait for your professor to assign new questionnaire for this quiz'
+        })
+        return;
+      }
+
       let students_who_already_answered = currentActivity.records.map((r) => r.user_id);
       if (students_who_already_answered.includes(currentUser.id)) {
+
+        if (!currentActivity.allow_review) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Review Not Allowed',
+            html: `
+              <p style="font-size: 16px; margin: 0;">
+                <b>Reviewing this activity is not allowed.</b>
+              </p>
+              <p style="font-size: 14px; color: #666;">
+                Please contact your instructor if you believe this is a mistake.
+              </p>
+            `,
+            confirmButtonText: 'Okay',
+            allowOutsideClick: false
+          });
+          return;
+        }
+
         Swal.fire({
-          icon: 'error',
-          title: 'Access Denied',
+          icon: 'question',
+          title: 'Quiz Already Submitted',
           html: `
-            <p>You’ve already submitted this activity.</p>
-            <p><b>Multiple attempts are not allowed.</b></p>
+            <p>You have already submitted this quiz.</p>
+            <p><b>Would you like to review your answers?</b></p>
           `,
-          confirmButtonText: 'Okay',
-          footer: 'Please contact your instructor if you think this is a mistake.',
-          allowOutsideClick: false
+          showCancelButton: true,
+          confirmButtonText: 'Review Quiz',
+          cancelButtonText: 'Cancel',
+          footer: 'If you believe this is an error, please contact your instructor.',
+          allowOutsideClick: false,
+          preConfirm: () => {
+            localStorage.setItem('currentClassroomId', currentClassroom.id);
+            navigate(`/activity/${currentActivity.id}/review`)
+          }
         });
         return;
       }
@@ -71,9 +106,9 @@ export default function ClassroomShow() {
       if (timeNow.getTime() < openTime.getTime()) {
         Swal.fire({
           icon: 'info',
-          title: 'Activity Not Yet Started',
+          title: 'Quiz Not Yet Started',
           html: `
-            <p>The activity will be open starting:</p>
+            <p>The quiz will be open starting:</p>
             <b>${openTime.toLocaleString()}</b>
           `,
           confirmButtonText: 'Okay',
@@ -86,13 +121,13 @@ export default function ClassroomShow() {
       if (closeTime && timeNow.getTime() > closeTime.getTime()) {
         Swal.fire({
           icon: 'warning',
-          title: 'Activity Closed',
+          title: 'Quiz Ended',
           html: `
-            <p>Sorry, this activity closed on:</p>
+            <p>Sorry, this quiz closed on:</p>
             <b>${closeTime.toLocaleString()}</b>
           `,
           confirmButtonText: 'Got it',
-          footer: 'You can no longer participate in this activity.',
+          footer: 'You can no longer participate in this quiz.',
           allowOutsideClick: false
         });
         return;
@@ -143,10 +178,31 @@ export default function ClassroomShow() {
       })
       
       refreshClassroom();
-      Toast("success", "Activity created!", 1000);
+      Toast("success", "Quiz created!", 1000);
 
     } catch (error) {
       console.error("Upload failed:", error);
+    }
+  }
+
+  
+  async function handleReviewToggle(e, activity_id) {
+    e.stopPropagation();
+    let toggledActivity = currentClassroom.activities.find(act => act.id === activity_id)
+
+    let res = await fetch(backendUrl('/activity'), {
+      method: 'PATCH', 
+      headers: {
+        'Content-type' : 'application/json'
+      },
+      body: JSON.stringify({
+        'activity_id': toggledActivity.id,
+        'value': !toggledActivity.allow_review
+      })
+    })
+
+    if (res.ok) {
+      refreshClassroom()
     }
   }
 
@@ -198,12 +254,12 @@ export default function ClassroomShow() {
     // to be implemented
     Swal.fire({
       icon: 'warning',
-      title: `Kick ${student.first_name}?`,
+      title: `Remove ${student.first_name}?`,
       text: "Are you sure you want to remove this student?",
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, kick!',
+      confirmButtonText: 'Yes, Remove!',
       cancelButtonText: 'Cancel'
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -231,7 +287,7 @@ export default function ClassroomShow() {
         // })
 
         refreshClassroom();
-        Swal.fire('Kicked!', `${student.first_name} has been removed.`, 'success');
+        Swal.fire('Removeed!', `${student.first_name} has been removed.`, 'success');
       }
     });
 
@@ -267,10 +323,10 @@ export default function ClassroomShow() {
 
     return (
       <>
-        <h2 className="text-2xl font-semibold text-center">Student Records</h2>
+        <h2 className="text-2xl font-semibold">Student Records</h2>
         <div class="overflow-x-auto rounded-lg mt-4">
           <table class="min-w-full table-auto bg-white border-collapse text-gray-700">
-            <thead class="bg-BackgroundColor_Darker text-white">
+            <thead class="bg-gradient-to-r from-BackgroundColor_Darker to-BackgroundColor_Darkest text-white">
               <tr>
                 <th class="px-6 py-3 text-center uppercase font-semibold">Student Name</th>
                 {
@@ -297,122 +353,248 @@ export default function ClassroomShow() {
     )
   }
 
+  function deleteClassroom() {
+
+    Swal.fire({
+      title: 'Confirm Classroom Deletion',
+      text: 'Please enter your password to confirm.',
+      icon: 'warning',
+      input: 'password',
+      inputLabel: 'Password',
+      inputPlaceholder: 'Enter your password',
+      inputAttributes: {
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      footer: '<span style="color: gray;">This action is irreversible.</span>',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Password is required to proceed!';
+        }
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const enteredPassword = result.value;
+
+        if (enteredPassword != currentUser.password) {
+          return;
+        } 
+
+        let res = await fetch(backendUrl('/classroom'), {
+          method: 'DELETE',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            'classroom_id': currentClassroom.id
+          })
+        })
+
+        if (!res.ok) {
+          return;
+        }
+    
+        // Optional: show loading
+        Swal.fire({
+          title: 'Deleting...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+    
+        // Example of follow-up after successful password check
+        // Replace this setTimeout with your actual AJAX/fetch call
+        setTimeout(() => {
+          Swal.fire(
+            'Deleted!',
+            'The classroom has been successfully deleted.',
+            'success'
+          );
+
+          refreshClassroom();
+          navigate('/classroom');
+        }, 1500);
+      }
+    });
+    
+  }
+
+
   
-
-
   return (
     <>
-      {isProf && <ActivityPanel show={showCreateActivityPanel} setShow={setShowCreateActivityPanel} classroom_id={id}/>}
+      {isProf && (
+        <ActivityPanel
+          show={showCreateActivityPanel}
+          setShow={setShowCreateActivityPanel}
+          classroom_id={id}
+        />
+      )}
+
+
+      <div className="flex justify-between items-start">
+        <Heading1>
+          <div className="text-2xl md:text-3xl font-semibold space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className="text-blue-500 cursor-pointer hover:underline text-base md:text-lg"
+                onClick={() => navigate('/classroom')}
+              >
+                Classroom &gt;
+              </span>
+              <span>{currentClassroom.name}</span>
+              {isProf && (
+                <span className="text-gray-400 text-sm md:text-base font-normal">
+                  (Key: {currentClassroom.classroom_key})
+                </span>
+              )}
+            </div>
+          </div>
+        </Heading1>
+
+        <button 
+          className="bg-red-500 hover:bg-red-600 transition text-lg px-6 py-3 text-white rounded-2xl font-semibold shadow-md"
+          onClick={deleteClassroom} 
+        >
+          Delete
+        </button>
+      </div>
+
+
+      {currentClassroom.description && (
+        <p onClick={recordTable} className="mb-4 text-gray-600">{currentClassroom.description}</p>
+      )}
+
+      <hr className="mb-6 border-gray-300" />
+
+      <div className="flex flex-col lg:flex-row gap-6">
         
-      <Heading1>
-        <div>
-          <span className="cursor-pointer" onClick={() => navigate('/classroom')}>Classroom &gt;</span> {currentClassroom.name} {isProf && <span className="text-gray-300">(Key: {currentClassroom.classroom_key})</span>}
-        </div>
-      </Heading1>
-
-      {currentClassroom.description && <p onClick={recordTable} className="mb-4">{currentClassroom.description}</p>}
-      <hr className="mb-8"/>
-      <div className="flex gap-4">
-
         {/* STUDENT DIV */}
-        {isProf && <div className="w-2/5 h-min bg-white px-4 rounded border py-4 hover:shadow-lg  transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">Students</h1>
-            <p className="text-gray-400">Students enrolled: {currentClassroom.students.filter(s => s.status === "accepted").length}</p>
-          </div>
-          <div className="text-black mt-4 space-y-2">
-            {
-              currentClassroom.students.map((student, index) => (
-                <div key={student.id} className="w-full border p-4 rounded flex justify-between">
-                  <p>{student.first_name} {student.last_name}</p>
-                  {student.status === 'pending' 
-                  ? 
-                    <div className="flex gap-4">
-                      <button onClick={() => acceptRequest(student.id)}className="text-blue-400 hover:text-blue-600">Accept</button>
-                      <button onClick={() => declineRequest(student.id)} className="text-red-400 hover:text-red-600">Decline</button>
+        {isProf && (
+          <div className="lg:w-2/5 bg-white border rounded-lg shadow-sm p-6 transition hover:shadow-md">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-semibold">Students</h2>
+              <span className="text-gray-500 text-sm">
+                Enrolled: {currentClassroom.students.filter(s => s.status === "accepted").length}
+              </span>
+            </div>
+            <div className="space-y-3 h-[580px] overflow-auto">
+              {currentClassroom.students.map(student => (
+                <div key={student.id} className="flex justify-between items-center bg-gray-50 p-4 rounded-lg border">
+                  <p className="font-medium">{student.first_name} {student.last_name}</p>
+                  {student.status === 'pending' ? (
+                    <div className="flex gap-3">
+                      <button onClick={() => acceptRequest(student.id)} className="text-blue-500 hover:text-blue-700">Accept</button>
+                      <button onClick={() => declineRequest(student.id)} className="text-red-500 hover:text-red-700">Decline</button>
                     </div>
-                  :
-                    <div className="flex gap-4">
-                      <button onClick={() => kickStudent(student.id)} className="text-red-400 hover:text-red-600">Kick</button>
-                    </div>
-                  }
+                  ) : (
+                    <button onClick={() => kickStudent(student.id)} className="text-red-500 hover:text-red-700">Remove</button>
+                  )}
                 </div>
-              ))
-            }
+              ))}
+            </div>
           </div>
-        </div>}
-        <div className="flex-1 space-y-2">
+        )}
+
+        {/* RIGHT SIDE: Activities + Materials */}
+        <div className="flex-1 flex flex-col gap-6">
 
           {/* ACTIVITY DIV */}
-          <div className="flex-1 bg-white px-4 py-4 rounded border hover:shadow-lg  transition-all duration-300">
-            <div className="flex justify-between items-start">
-              <h2 className="text-2xl font-semibold">Activities</h2>
-              {isProf && 
-                <Button 
-                  onClick={() => setShowCreateActivityPanel(true)}
-                >
-                  <div className="w-6">
-                    <img src={plus_icon} alt="+" />
-                  </div>
-                  <span className="font-semibold">Create</span>
+          <div className="bg-white border rounded-lg shadow-sm p-6 transition hover:shadow-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold">Quizzes</h2>
+              {isProf && (
+                <Button onClick={() => setShowCreateActivityPanel(true)}>
+                  <img src={plus_icon} alt="+" className="w-5" />
+                  <span className="ml-1 font-medium">Create</span>
                 </Button>
-              }
+              )}
             </div>
-            <div className="grid gap-2 mt-4">
-              {
-                currentClassroom.activities.map(activity => (
-                  <div 
-                    key={activity.id} 
-                    className="cursor-pointer w-full border-2 p-4 rounded text-xl hover:border-BackgroundColor_Darker transition-all duration-200"
-                    onClick={() => openActivity(activity.id)}
-                  >
-                    {activity.name}
+            <div className="space-y-3 max-h-[380px] overflow-auto">
+              {currentClassroom.activities.map(activity => (
+                <div
+                  key={activity.id}
+                  onClick={() => openActivity(activity.id)}
+                  className="w-full bg-gradient-to-r from-BackgroundColor_Darker to-BackgroundColor_Darkest rounded-xl p-4 cursor-pointer transition-all hover:shadow-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                >
+                  <div className="flex-1 flex justify-between items-center">
+                    <div className="text-white font-semibold text-xl w-56 truncate">{activity.name}</div>
+                  
+                    <div className="text-sm text-white">
+                      {activity.quiz ? (
+                        <p className="text-lg">{activity.quiz.questions.length} Items</p>
+                      ) : (
+                        <p className="italic text-gray-300">No Questionnaire</p>
+                      )}
+                    </div>
+                  
+                    <div className="text-sm text-gray-200 text-right sm:text-left">
+                      <p><span className="text-gray-300">Open:</span> {activity.open_at}</p>
+                      <p><span className="text-gray-300">Close:</span> {activity.close_at}</p>
+                      {activity.timer > 0 && (
+                        <p><span className="text-gray-300">Timer:</span> {formatSeconds(activity.timer)} mins</p>
+                      )}
+                    </div>
+                    {currentUser.role === "professor" && (
+                      <div className="w-14 flex flex-col items-center gap-1">
+                        <p className="text-sm text-white">Review?</p>
+                        <div onClick={(e) => handleReviewToggle(e, activity.id)} className={`w-full h-7 rounded-full relative transition-all ${activity.allow_review ? "bg-BackgroundColor_Darker/60" : "bg-white"}`}>
+                          <div className={`
+                            h-full scale-90 aspect-square rounded-full bg-BackgroundColor_Darker absolute top-1/2 -translate-y-1/2 transition-all
+                            ${activity.allow_review ? "right-0.5" : "left-0.5"}
+                          `}></div> 
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ))
-              }
+                </div>
+              ))}
             </div>
-          </div>  
+          </div>
 
           {/* LEARNING MATERIALS DIV */}
-          {/* TO BE IMPLEMENTED */}
-          <div className="flex-1 bg-white px-4 py-4 rounded border hover:shadow-lg  transition-all duration-300">
-            <div className="flex justify-between items-start">
+          <div className="bg-white border rounded-lg shadow-sm p-6 transition hover:shadow-md">
+            <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold">Materials</h2>
-              {isProf && 
+              {isProf && (
                 <>
-                  <input type="file" ref={fileInputRef} className="hidden"/> 
-                  <Button 
-                    onClick={handleFileUpload}
-                  >
-                    <div className="w-6">
-                      <img src={plus_icon} alt="+" />
-                    </div>
-                    <span className="font-semibold">Create</span>
+                  <input type="file" ref={fileInputRef} className="hidden" />
+                  <Button onClick={handleFileUpload}>
+                    <img src={plus_icon} alt="+" className="w-5" />
+                    <span className="ml-1 font-medium">Upload</span>
                   </Button>
                 </>
-              }
+              )}
             </div>
-            <div className="grid grid-cols-3 gap-2 mt-4">
-              {
-                currentClassroom.learning_materials.map(learning_material => (
-                  <a 
-                    key={learning_material.id} 
-                    className="cursor-pointer w-full border-2 p-8 rounded text-xl hover:border-BackgroundColor_Darker transition-all duration-200 text-wrap flex items-center"
-                    href={learning_material.link}
-                    target="_blank"
-                  >
-                    <p className="max-w-full text-wrap overflow-hidden">{learning_material.file_name}</p>
-                  </a>
-                ))
-              }
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {currentClassroom.learning_materials.map(material => (
+                <a
+                  key={material.id}
+                  href={material.link}
+                  target="_blank"
+                  className="p-4 border rounded-lg bg-gradient-to-r from-BackgroundColor_Darker to-BackgroundColor_Darkest transition text-white flex items-center hover:scale-110"
+                >
+                  <p className="truncate">{material.file_name}</p>
+                </a>
+              ))}
             </div>
-          </div>  
+          </div>
         </div>
+      </div>
 
-      </div>
-      <div className="w-full mt-8 bg-white px-4 rounded border py-4 hover:shadow-lg  transition-all duration-300 flex flex-col">
-        { recordTable() }
-      </div>
+      {/* RECORD TABLE SECTION */}
+      {isProf && (
+        <div className="mt-8 bg-white border rounded-lg shadow-sm p-6 hover:shadow-md transition">
+          {recordTable()}
+        </div>
+      )}
     </>
+
   )
 }

@@ -9,6 +9,7 @@ from configs import db
 
 class post_answer_validator(BaseModel):
   user_id: int
+  activity_id: int
   question_id: int
   correct: bool
   student_answer: str

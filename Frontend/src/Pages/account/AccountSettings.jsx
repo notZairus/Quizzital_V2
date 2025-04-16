@@ -109,7 +109,7 @@ export default function AccountSettings() {
             </div>
           </div>
 
-          <div className="flex-1 bg-white rounded-3xl shadow px-16 py-12 flex flex-col">
+          <div className="flex-1 bg-white rounded-3xl shadow-sm hover:shadow-md transition px-16 py-12 flex flex-col">
             <Heading1>{ displayedInfo === "personal" ? "Personal Information" : "Account Information"}</Heading1> 
             <div className="flex-1 flex items-start justify-between gap-20 mt-4">
               {displayedInfo === "personal" 

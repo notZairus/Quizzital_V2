@@ -74,3 +74,8 @@ export function formatSeconds(seconds) {
 export function processWord(word) {
   return word.replaceAll(' ', '').replaceAll('.', '').replaceAll('-', '').toLowerCase();
 }
+
+
+export function randomizeOrder(_array) {
+  return _array.sort((a, b) => (Math.random() * 100) - (Math.random() * 100));
+}

@@ -7,7 +7,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import bell_icon from "../../../assets/icons/bell-alt-svgrepo-com.svg";
 import { backendUrl } from "../../../js/functions";
 import Toast from "../../../Components/Toast";
-
+import Swal from "sweetalert2";
 
 
 export default function ShowActivity() {
@@ -15,7 +15,7 @@ export default function ShowActivity() {
   const parameters = useParams();
   const [activity, setActivity] = useState(null);
   const [classroom, setClassroom] = useState(null);
-  const { classrooms } = useContext(ClassroomContext);
+  const { classrooms, refreshClassroom } = useContext(ClassroomContext);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   useEffect(() => {
@@ -68,13 +68,13 @@ export default function ShowActivity() {
 
     return (
       <>
-        <p className="text-center font-semibold text-lg">Number of Students Who Answered the Activity</p>
+        <p className="text-center font-semibold text-lg">Number of Students Who Answered the Quiz</p>
         <div className="w-full my-4">
           <Doughnut  
             data={data}
           />
         </div>
-        <p className="text-center">{activity?.records.length} out of {classroom?.students.length} students answered this activity.</p>
+        <p className="text-center">{activity?.records.length} out of {classroom?.students.length} students answered this quiz.</p>
       </>
     )
   }
@@ -108,7 +108,6 @@ export default function ShowActivity() {
           label: "Number of Students",
           data: scores,
           backgroundColor: "#12B9D8",
-          barThickness: 50,
         },
       ],
     };
@@ -180,7 +179,7 @@ export default function ShowActivity() {
           <p className="text-center font-semibold text-lg">Students</p>
           <div className="w-full h-full flex items-start justify-between gap-4 mt-4">
             <div className="flex-1 h-20">
-              <p>Finished Students: </p>
+              <p>Completed: </p>
               <div className="mt-2 w-full space-y-2 max-h-64 overflow-auto cursor-pointer">
                 {finishedStudents.map((s, index) => (
                   <div onClick={() => setSelectedStudent(s)} className="w-full px-4 py-3 border hover:border-BackgroundColor_Darker transition-all duration-300 rounded"> 
@@ -191,7 +190,7 @@ export default function ShowActivity() {
             </div>
   
             <div className="flex-1">
-              <p>Unfinished Students: </p>
+              <p>Pending: </p>
               <div className="mt-2 w-full space-y-2 max-h-64 overflow-auto">
                 {unfinishedStudents.map((s, index) => (
                   <div className="w-full px-4 py-2 border h-12 hover:border-BackgroundColor_Darker transition-all duration-300 rounded flex justify-between items-center"> 
@@ -228,7 +227,7 @@ export default function ShowActivity() {
 
     return (
       <>
-        <p className="text-center font-semibold text-lg">Student's Activity Result</p>
+        <p className="text-center font-semibold text-lg">Student's Quiz Result</p>
         <div className="w-full h-full grid grid-cols-2 grid-rows-7 gap-y-4 mt-4 px-8">
           <div className="bg-white border-r-2 col-span-1 row-span-3 px-4 py-2 flex flex-col">
             <div className="flex-1 flex flex-col gap-4 justify-center items-center">
@@ -253,58 +252,125 @@ export default function ShowActivity() {
   }
 
 
+  function deleteActivity() {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This activity will be permanently deleted.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      footer: '<span style="color: gray;">You cannot undo this action</span>'
+    }).then( async (result) => {
+      if (result.isConfirmed) {
+
+        let res = await fetch(backendUrl('/activity'), {
+          method: 'DELETE',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            'activity_id': activity.id
+          })
+        })
+
+        if (!res.ok) {
+          return;
+        }
+
+        console.log("Activity deleted"); // Replace with actual delete logic
+        Swal.fire(
+          'Deleted!',
+          'The activity has been deleted.',
+          'success'
+        );
+
+        refreshClassroom();
+        navigate(`/classroom/${classroom.id}`)
+      }
+    });
+  }
+
+
   return (
     <>
-      <Heading1>
-        <div className="cursor-pointer">
-          <span onClick={() => navigate('/classroom')}>Classroom</span> &gt; <span onClick={() => navigate(`/classroom/${classroom.id}`)}>{classroom?.name}</span> &gt; <span>{activity?.name}</span>
-        </div>
-      </Heading1>
-      
-      <hr className="mb-8"/>
+  
+      <div className="flex justify-between items-start">
+        <Heading1>
+          <div className="text-2xl md:text-3xl font-semibold space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className="text-blue-500 cursor-pointer hover:underline text-base md:text-lg"
+                onClick={() => navigate('/classroom')}
+              >
+                Classroom &gt;
+              </span>
+              <span
+                className="text-blue-500 cursor-pointer hover:underline text-base md:text-lg"
+                onClick={() => navigate(`/classroom/${classroom.id}`)}
+              >
+                {classroom?.name} &gt;
+              </span>
+              <span>{activity?.name}</span>
+            </div>
+          </div>
+        </Heading1>
 
-      <div className="w-full grid grid-cols-9 transition-all duration-300 gap-4 pb-2">
+        <button 
+          className="bg-red-500 hover:bg-red-600 transition text-lg px-6 py-3 text-white rounded-2xl font-semibold shadow-md"
+          onClick={() => deleteActivity()} 
+        >
+          Delete
+        </button>
+      </div>
 
-        <div className="w-full text-4xl flex items-center justify-center col-span-full h-20 bg-white shadow rounded-xl">
-          <p className="font-semibold text-black/80">
-            Activity Statistics
-          </p>
+      <hr className="my-6"/>
+
+      <div className="w-full grid grid-cols-1 md:grid-cols-9 gap-6 pb-2">
+
+        {/* Section Title: Activity Statistics */}
+        <div className="w-full text-2xl font-semibold flex items-center justify-center col-span-full bg-white p-4 shadow rounded-xl">
+          Quiz Statistics
         </div>
-        
-        <div className="w-full h-full bg-white col-span-2 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
+
+        {/* Graph 1: Number of Students Who Answered the Activity */}
+        <div className="w-full bg-white col-span-1 md:col-span-2 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
           { Graph1() }
         </div>
 
-        <div className="w-full h-full bg-white col-span-5 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
-          {activity?.quiz 
-            ? Graph2()
-            : <div className="w-full h-full flex items-center justify-center">
-                <p className="text-3xl text-gray-500">No Questions to Evaluate</p>
-              </div>
-          }
+        {/* Graph 2: Score Distribution */}
+        <div className="w-full bg-white col-span-1 md:col-span-5 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
+          {activity?.quiz ? Graph2() : (
+            <div className="w-full h-full flex items-center justify-center">
+              <p className="text-3xl text-gray-500">No Questions to Evaluate</p>
+            </div>
+          )}
         </div>
 
-        <div className="w-full h-full bg-white col-span-2 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
+        {/* Graph 3: Passing Rate */}
+        <div className="w-full bg-white col-span-1 md:col-span-2 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
           { Graph3() }
         </div>
 
-        <div className="w-full text-4xl flex items-center justify-center col-span-full h-20 bg-white shadow rounded-xl">
-          <p className="font-semibold text-black/80">
-            Student Statistics
-          </p>
+        {/* Section Title: Student Statistics */}
+        <div className="w-full text-2xl font-semibold flex items-center justify-center col-span-full bg-white p-4 shadow rounded-xl">
+          Student Statistics
         </div>
 
-        <div className="w-full h-96 bg-white col-span-4 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
+        {/* Student List: Finished and Unfinished Students */}
+        <div className="w-full bg-white col-span-1 md:col-span-4 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
           { studentList() }
         </div>
 
-        <div className="w-full bg-white col-span-5 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
-          {activity?.quiz 
-            ? Graph5()
-            : <div className="w-full h-full flex items-center justify-center">
-                <p className="text-3xl text-gray-500">No Questions to Evaluate</p>
-              </div>
-          }
+        {/* Graph 5: Student's Activity Result */}
+        <div className="w-full bg-white col-span-1 md:col-span-5 rounded shadow hover:shadow-lg hover:scale-105 transition-all duration-300 p-4 flex flex-col items-center">
+          {activity?.quiz ? Graph5() : (
+            <div className="w-full h-full flex items-center justify-center">
+              <p className="text-3xl text-gray-500">No Questions to Evaluate</p>
+            </div>
+          )}
         </div>
 
       </div>

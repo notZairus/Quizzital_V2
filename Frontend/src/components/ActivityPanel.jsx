@@ -102,89 +102,129 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
     Toast("success", "Activity created!", 1000);
     refreshClassroom();
     setShow(false);
-
-    setTimeout(async () => {
-      navigate(0);
-    }, 1000)
   }
 
 
   return (
     <>
-      <div 
-        onClick={() => setShow(false)} 
-        className={`flex justify-end h-full top-0 fixed right-0 ${show ? "w-full opacity-100" : "w-0 opacity-0"} transition-all duration-1000 overflow-hidden`}
+      {/* Overlay + Drawer Container */}
+      <div
+        onClick={() => setShow(false)}
+        className={`fixed inset-0 z-50 transition-all duration-500 ease-in-out ${
+          show ? "bg-black bg-opacity-40 opacity-100" : "opacity-0 pointer-events-none"
+        }`}
       >
-        <div onClick={(e) => e.stopPropagation()} className="w-2/5 h-full overflow-auto bg-white px-8 pt-24 shadow-xl">
-          <Heading1>Create Activity</Heading1>
-          <div>
+        {/* Drawer */}
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className={`fixed top-0 right-0 overflow-auto h-full w-full sm:w-[500px] bg-white shadow-2xl px-8 pt-12 py-8 transition-transform duration-500 ease-in-out ${
+            show ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <Heading1>Create Quiz</Heading1>
 
-            <div className="space-y-4">
-
-              <div className="mb-8">
-                <p className="text-xl mb-2">Activity Name: </p>
-                <input value={newActivity.name} onChange={(e) => setNewActivity(prev => ({...prev, name: e.target.value}))} type="text" className="w-full text-2xl px-4 py-3 rounded border"/>
-              </div>
-
-              <div>
-                <p className="text-xl mb-2">Activity Grade: </p>
-                <select value={newActivity.score} onChange={(e) => setNewActivity(prev => ({...prev, score: e.target.value}))} className="w-full text-lg px-4 py-3 rounded border" required>
-                  <option value={100} required>100</option>
-                  <option value={50} required>50</option>
-                  <option value={20} required>20</option>
-                  <option value={10} required>10</option>
-                  <option value={5} required>5</option>
-                </select>
-              </div>
-
-              <div>
-                <p className="text-xl mb-2">Questionaire: </p>
-                <select value={newActivity.quiz_id} onChange={(e) => setNewActivity(prev => ({...prev, quiz_id: e.target.value}))} className="w-full text-lg px-4 py-3 rounded border" required>
-                  {
-                    quizzes.map(quiz => <option key={quiz.id} value={quiz.id} required>{quiz.name}</option>)
-                  }
-                </select>
-              </div>
-
-              <div className="flex gap-5 w-full">
-                <div className="flex-1">
-                  <p className="text-xl mb-2">Open: </p>
-                  <input value={newActivity.open_at} onChange={(e) => setNewActivity(prev => ({...prev, open_at: e.target.value}))} type="datetime-local" className="w-full text-md px-4 py-3 rounded border"/>
-                </div>
-                <div className="flex-1">
-                  <p className="text-xl mb-2">Close: </p>
-                  <input value={newActivity.close_at} onChange={(e) => setNewActivity(prev => ({...prev, close_at: e.target.value}))} type="datetime-local" className="w-full text-md px-4 py-3 rounded border"/>
-                </div>
-              </div>
-
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-xl mb-2">has timer? </p>
-                  <input
-                    onChange={() => {
-                      setHasTimer(!hasTimer)
-                      setNewActivity(prev => ({...prev, timer: null}))
-                    }}
-                    type="checkbox"
-                    className="appearance-none w-16 focus:outline-none checked:bg-blue-300 h-7 bg-gray-300 rounded-full before:inline-block before:rounded-full before:bg-blue-500 before:h-7 before:w-8 checked:before:translate-x-full shadow-inner transition-all duration-300 before:ml-0.5"
-                  />
-                </div>
-  
-                {hasTimer && <div className="mb-2">
-                  <p className="text-xl mb-2">Timer (minutes): </p>
-                  <input value={newActivity.timer} onChange={(e) => setNewActivity(prev => ({...prev, timer: e.target.value}))} type="number" className="w-1/3 text-2xl px-4 py-3 rounded border"/>
-                </div>}
-              </div>
-
+          <div className="space-y-6 mt-8">
+            {/* Activity Name */}
+            <div>
+              <label className="text-lg font-medium mb-1 block">Quiz Name</label>
+              <input
+                value={newActivity.name}
+                onChange={(e) => setNewActivity(prev => ({ ...prev, name: e.target.value }))}
+                type="text"
+                className="w-full px-4 py-3 rounded-lg border text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
             </div>
 
-            <button onClick={createActivity} className="w-full my-8 px-4 py-4 bg-BackgroundColor_Darker text-white text-xl rounded">
-              Create Activity
-            </button>
+            {/* Activity Grade */}
+            <div>
+              <label className="text-lg font-medium mb-1 block">Grade</label>
+              <select
+                value={newActivity.score}
+                onChange={(e) => setNewActivity(prev => ({ ...prev, score: e.target.value }))}
+                className="w-full px-4 py-3 rounded-lg border text-lg focus:outline-none"
+              >
+                {[100, 50, 20, 10, 5].map(score => (
+                  <option key={score} value={score}>{score}</option>
+                ))}
+              </select>
+            </div>
 
+            {/* Quiz Selection */}
+            <div>
+              <label className="text-lg font-medium mb-1 block">Questionnaire</label>
+              <select
+                value={newActivity.quiz_id}
+                onChange={(e) => setNewActivity(prev => ({ ...prev, quiz_id: e.target.value }))}
+                className="w-full px-4 py-3 rounded-lg border text-lg focus:outline-none"
+              >
+                {quizzes.map(quiz => (
+                  <option key={quiz.id} value={quiz.id}>{quiz.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Open/Close Date */}
+            <div className="flex flex-col gap-4">
+              <div className="flex-1">
+                <label className="text-lg font-medium mb-1 block">Open</label>
+                <input
+                  value={newActivity.open_at}
+                  onChange={(e) => setNewActivity(prev => ({ ...prev, open_at: e.target.value }))}
+                  type="datetime-local"
+                  className="w-full px-4 py-3 rounded-lg border text-md"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="text-lg font-medium mb-1 block">Close</label>
+                <input
+                  value={newActivity.close_at}
+                  onChange={(e) => setNewActivity(prev => ({ ...prev, close_at: e.target.value }))}
+                  type="datetime-local"
+                  className="w-full px-4 py-3 rounded-lg border text-md"
+                />
+              </div>
+            </div>
+
+            {/* Timer Toggle */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <label className="text-lg font-medium">Has Timer?</label>
+                <input
+                  type="checkbox"
+                  checked={hasTimer}
+                  onChange={() => {
+                    setHasTimer(!hasTimer)
+                    setNewActivity(prev => ({ ...prev, timer: null }))
+                  }}
+                  className="w-6 h-6 rounded border-2 border-gray-400 focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {hasTimer && (
+                <div className="flex items-center gap-3">
+                  <label className="text-lg font-medium">Minutes:</label>
+                  <input
+                    value={newActivity.timer}
+                    onChange={(e) => setNewActivity(prev => ({ ...prev, timer: e.target.value }))}
+                    type="number"
+                    min={1}
+                    className="w-24 px-3 py-2 rounded-lg border text-lg"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              onClick={createActivity}
+              className="w-full bg-gradient-to-r from-BackgroundColor_Darker to-BackgroundColor_Darkest hover:bg-BackgroundColor_Darker  text-white font-semibold py-3 rounded-lg text-lg transition-all duration-300"
+            >
+              Create
+            </button>
           </div>
         </div>
       </div>
     </>
+
   )
 }

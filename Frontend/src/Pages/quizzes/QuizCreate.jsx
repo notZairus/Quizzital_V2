@@ -143,14 +143,31 @@ export default function QuizCreate() {
     Swal.fire({
       title: 'Ai',
       html: `
-          <textarea id="text_area" class="w-full h-80 border-2 border-black/20 resize-none p-4"> </textarea>
-          <div class="flex flex-col gap-2 items-start mt-4">
-            <label for="q_count">
-              Number of Questions: 
-              <input id="q_count" type="number" max="50" min="5" step="1" class="w-12 border ml-2" required/>
-            </label>
-          </div>
-      `,
+            <div class="flex flex-col gap-4 text-left">
+              <label class="flex flex-col gap-2">
+                <span class="text-lg font-semibold">Paste Lesson:</span>
+                <textarea 
+                  id="text_area" 
+                  class="w-full h-80 border border-gray-300 rounded-md resize-none p-4 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                  placeholder="Paste your lesson here..."
+                ></textarea>
+              </label>
+
+              <label class="flex flex-col gap-2">
+                <span class="text-lg font-semibold">Number of Questions:</span>
+                <input 
+                  id="q_count" 
+                  type="number" 
+                  max="50" 
+                  min="5" 
+                  step="5" 
+                  class="w-24 border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                  placeholder="e.g. 10"
+                  required
+                />
+              </label>
+            </div>
+          `,
       confirmButtonText: 'Extract Questions',
       confirmButtonColor: mainColor,
       showCancelButton: true,
@@ -222,189 +239,164 @@ export default function QuizCreate() {
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-8">
         <Heading1>Create Questionnaire</Heading1>
         <ButtonLarge onClick={showAi}>Generate with AI</ButtonLarge>
       </div>
 
-      <div className="my-12">
-        <p className="text-xl mb-2">Questionnaire Name: </p>
-        <input ref={quiz_name_ref} type="text" className="w-1/2 text-2xl px-4 py-3 rounded border"/>
+      <div className="mb-12">
+        <label className="block text-xl font-medium mb-2">Questionnaire Name</label>
+        <input 
+          ref={quiz_name_ref} 
+          type="text" 
+          placeholder="Enter quiz title..." 
+          className="w-full max-w-xl text-2xl px-4 py-3 rounded border border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none" 
+        />
       </div>
-      
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-xl mb-4">Multiple Choice</h1>
-          <div className="space-y-2">
-            {
-              multipleChoiceQuestions.map((question, index) => (
-                <div key={index} className="w-full max-h-80 bg-white border-black borde rounded px-4 pt-2 pb-4">
-                  <div className="flex justify-end">
-                    <button onClick={() => setMultipleChoiceQuestions((prev) => prev.filter(((prevQuestion, i) => i !== index)) )}>
-                      X
-                    </button>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="flex-1 flex flex-col">
-                      <p className="text-xl mb-2">Question: </p>
-                      <div className="h-full">
-                        <textarea 
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.question} 
-                          onChange={e => {
-                            let allQuestions = [...multipleChoiceQuestions];
-                            allQuestions[index].question = e.target.value;
-                            setMultipleChoiceQuestions(allQuestions)
-                          }}  
-                        />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xl mb-2">Choices: </p>
-                      <div className="space-y-2">
-                        <input 
-                          type="text"
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.choices[0] || ""}
-                          onChange={(e) => {
-                            setMultipleChoiceQuestions(prev => {
-                              return prev.map((prevQuestion, i) => {
-                                if (i === index) {
-                                  let choicess = prevQuestion.choices;
-                                  choicess[0] = e.target.value;
-                                  return {
-                                    ...prevQuestion,
-                                    choices: choicess
-                                  } 
-                                }
-                                return prevQuestion;
-                              })
-                            })
-                          }}
-                        />
-                        <input 
-                          type="text"
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.choices[1] || ""}
-                          onChange={(e) => {
-                            setMultipleChoiceQuestions(prev => {
-                              return prev.map((prevQuestion, i) => {
-                                if (i === index) {
-                                  let choicess = prevQuestion.choices;
-                                  choicess[1] = e.target.value;
-                                  return {
-                                    ...prevQuestion,
-                                    choices: choicess
-                                  } 
-                                }
-                                return prevQuestion;
-                              })
-                            })
-                          }}
-                        />
-                        <input 
-                          type="text"
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.choices[2] || ""}
-                          onChange={(e) => {
-                            setMultipleChoiceQuestions(prev => {
-                              return prev.map((prevQuestion, i) => {
-                                if (i === index) {
-                                  let choicess = prevQuestion.choices;
-                                  choicess[2] = e.target.value;
-                                  return {
-                                    ...prevQuestion,
-                                    choices: choicess
-                                  } 
-                                }
-                                return prevQuestion;
-                              })
-                            })
-                          }}
-                        />
-                        <div>
-                          <p className="text-xl mb-2">Answer: </p>
-                          <input 
-                            type="text" 
-                            className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                            value={question.answer}
-                            onChange={(e) => setMultipleChoiceQuestions(prev => (
-                              prev.map((q, i) => {
-                                return index === i ? { ...q, answer: e.target.value} : q; 
-                              })
-                            ))}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+
+      <div className="space-y-12">
+
+        {/* Multiple Choice Section */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Multiple Choice</h2>
+
+          <div className="space-y-6">
+            {multipleChoiceQuestions.map((question, index) => (
+              <div key={index} className="rounded-lg border border-gray-300 p-6 bg-white shadow-sm hover:shadow-md transition space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-medium">Question {index + 1}</span>
+                  <button
+                    onClick={() => setMultipleChoiceQuestions(prev => prev.filter((_, i) => i !== index))}
+                    className="text-red-500 hover:underline"
+                  >
+                    Remove
+                  </button>
                 </div>
-              ))
-            }
-            <div onClick={addMultipleChoiceQuestion} className="w-full h-20 bg-white/70 text-black/50 flex items-center rounded text-lg px-8 cursor-pointer">
-              Add Multiple Choice Question
-            </div>
+
+                <div>
+                  <label className="text-base font-medium">Question</label>
+                  <textarea
+                    className="w-full mt-1 border rounded px-4 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={question.question}
+                    onChange={e => {
+                      const updated = [...multipleChoiceQuestions];
+                      updated[index].question = e.target.value;
+                      setMultipleChoiceQuestions(updated);
+                    }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {[0, 1, 2].map(choiceIndex => (
+                    <input
+                      key={choiceIndex}
+                      type="text"
+                      className="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      placeholder={`Choice ${choiceIndex + 1}`}
+                      value={question.choices[choiceIndex] || ""}
+                      onChange={e => {
+                        setMultipleChoiceQuestions(prev =>
+                          prev.map((q, i) =>
+                            i === index
+                              ? {
+                                  ...q,
+                                  choices: Object.assign([], q.choices, {
+                                    [choiceIndex]: e.target.value,
+                                  }),
+                                }
+                              : q
+                          )
+                        );
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <div>
+                  <label className="text-base font-medium">Correct Answer</label>
+                  <input
+                    type="text"
+                    className="w-full mt-1 border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={question.answer}
+                    onChange={e =>
+                      setMultipleChoiceQuestions(prev =>
+                        prev.map((q, i) => (i === index ? { ...q, answer: e.target.value } : q))
+                      )
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+
+            <button
+              onClick={addMultipleChoiceQuestion}
+              className="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium py-4 rounded-lg border border-blue-200 transition"
+            >
+              + Add Multiple Choice Question
+            </button>
           </div>
-        </div>
+        </section>
 
-        <div>
-          <h1 className="text-xl mb-4">Identifications</h1>
-          <div className="space-y-2">
+        {/* Identification Section */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Identification</h2>
 
-
-            {
-              idenficationQuestions.map((question, index) => (
-                <div key={index} className="w-full max-h-80 bg-white border-black borde rounded px-4 pt-2 pb-4">
-                  <div className="flex justify-end">
-                    <button onClick={() => setIdenficationQuestions((prev) => prev.filter(((prevQuestion, i) => i !== index)) )}>
-                      X
-                    </button>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="flex-1 flex flex-col">
-                      <p className="text-xl mb-2">Question: </p>
-                      <div className="h-full">
-                        <textarea 
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.question} 
-                          onChange={e => {
-                            let allQuestions = [...idenficationQuestions];
-                            allQuestions[index].question = e.target.value;
-                            setIdenficationQuestions(allQuestions)
-                          }}  
-                        />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xl mb-2">Answer: </p>
-                      <input 
-                        type="text" 
-                        className="w-full font-lg py-2 px-4 resize-none border rounded"
-                        value={question.answer}
-                        onChange={(e) => setIdenficationQuestions(prev => (
-                          prev.map((q, i) => {
-                            return index === i ? { ...q, answer: e.target.value} : q; 
-                          })
-                        ))}
-                      />
-                    </div>
-                  </div>
+          <div className="space-y-6">
+            {idenficationQuestions.map((question, index) => (
+              <div key={index} className="rounded-lg border border-gray-300 p-6 bg-white shadow-sm hover:shadow-md transition space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-medium">Question {index + 1}</span>
+                  <button
+                    onClick={() => setIdenficationQuestions(prev => prev.filter((_, i) => i !== index))}
+                    className="text-red-500 hover:underline"
+                  >
+                    Remove
+                  </button>
                 </div>
-              ))
-            }
 
+                <div>
+                  <label className="text-base font-medium">Question</label>
+                  <textarea
+                    className="w-full mt-1 border rounded px-4 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={question.question}
+                    onChange={e => {
+                      const updated = [...idenficationQuestions];
+                      updated[index].question = e.target.value;
+                      setIdenficationQuestions(updated);
+                    }}
+                  />
+                </div>
 
-            <div onClick={addIdentificationQuestion} className="w-full h-20 bg-white/70 text-black/50 flex items-center rounded text-lg px-8 cursor-pointer">
-              Add Identification Question
-            </div>
-          </div>    
-          
-        </div>
+                <div>
+                  <label className="text-base font-medium">Answer</label>
+                  <input
+                    type="text"
+                    className="w-full mt-1 border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={question.answer}
+                    onChange={e =>
+                      setIdenficationQuestions(prev =>
+                        prev.map((q, i) => (i === index ? { ...q, answer: e.target.value } : q))
+                      )
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+
+            <button
+              onClick={addIdentificationQuestion}
+              className="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium py-4 rounded-lg border border-blue-200 transition"
+            >
+              + Add Identification Question
+            </button>
+          </div>
+        </section>
       </div>
 
-      <div className="mt-8 flex justify-end">
-        <ButtonLarge onClick={createQuiz}>Create</ButtonLarge>
+      <div className="mt-12 flex justify-end">
+        <ButtonLarge onClick={createQuiz}>Create Quiz</ButtonLarge>
       </div>
     </>
+
   )
 }

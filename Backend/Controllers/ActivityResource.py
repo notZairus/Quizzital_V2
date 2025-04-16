@@ -51,3 +51,23 @@ class ActivityResource(Resource):
     return jsonify({
       "activities": activities
     });
+
+  def patch(self): 
+    data = request.get_json()
+    _activity = Activity.query.filter_by(id=data['activity_id']).first()
+    _activity.allow_review = data['value']
+    db.session.commit()
+
+    return jsonify({'message': 'successful!'})
+  
+  def delete(self):
+    data = request.get_json()
+    activity = Activity.query.get(data['activity_id'])
+    print(activity)
+
+    db.session.delete(activity);
+    db.session.commit()
+
+
+
+    return jsonify({'message': 'successful'})

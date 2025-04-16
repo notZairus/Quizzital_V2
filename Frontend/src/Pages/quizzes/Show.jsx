@@ -22,8 +22,10 @@ export default function Show() {
   const [currentQuiz, setCurrentQuiz] = useState(quizzes.find(quiz => quiz.id == id));
   const [deleted, setDeleted] = useState([]);
 
+  console.log(currentQuiz)
 
-  async function deleteQuiz() {
+
+  function deleteQuiz() {
     Swal.fire({
       title: "Confirm Deletion? ",
       icon: 'warning',
@@ -65,6 +67,11 @@ export default function Show() {
     let multipleChoiceQuestions = currentQuiz.questions.filter(q => q.type === "multiple_choice")
     let idenficationQuestions = currentQuiz.questions.filter(q => q.type === "identification")
     let invalid = false;
+
+    if(multipleChoiceQuestions.length + idenficationQuestions.length === 0) {
+      deleteQuiz()
+      return;
+    }
 
     // validate quiz name
     if (quiz_name_ref.current.value === "") {
@@ -202,192 +209,181 @@ export default function Show() {
   
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <Heading1><div><span className="cursor-pointer" onClick={() => navigate('/questionnaire')}>Questionnaire &gt;</span> {currentQuiz.name}</div></Heading1>
+      <div className="flex justify-between items-center mb-6">
+
+        <Heading1>
+          <div className="text-2xl md:text-3xl font-semibold space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className="text-blue-500 cursor-pointer hover:underline text-base md:text-lg"
+                onClick={() => navigate('/questionnaire')}
+              >
+                Questionnaire &gt;
+              </span>
+              <span>{currentQuiz.name}</span>
+            </div>
+          </div>
+        </Heading1>
+        
+
+
         <button 
-          className="bg-red-500 text-lg px-6 py-3 text-white rounded font-semibold shadow"
+          className="bg-red-500 hover:bg-red-600 transition text-lg px-6 py-3 text-white rounded-2xl font-semibold shadow-md"
           onClick={deleteQuiz}
         >
           Delete
         </button>
       </div>
 
-      <div className="mb-12 mt-4">
-        <p className="text-xl mb-2">Name: </p>
+      <div className="mb-12 mt-6">
+        <label className="text-xl font-medium block mb-2">Name:</label>
         <input 
           ref={quiz_name_ref} 
           type="text" 
-          className="w-1/2 text-2xl px-4 py-3 rounded border"
+          className="w-full max-w-xl text-2xl px-4 py-3 rounded-xl border shadow-sm"
           value={currentQuiz.name}
-          onChange={(e) => setCurrentQuiz(prev => ({...prev, 'name': e.target.value}))}
+          onChange={(e) => setCurrentQuiz(prev => ({ ...prev, name: e.target.value }))}
         />
       </div>
       
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-xl mb-4">Multiple Choice</h1>
-          <div className="space-y-2">
-            {
-              currentQuiz.questions.filter(question => question.type === "multiple_choice").map(question => (
-                <div key={question.id} className="w-full max-h-80 bg-white border-black borde rounded px-4 pt-2 pb-4">
-                  <div className="flex justify-end">
-                    <button onClick={() => removeQuestion(question.id)}>
-                      X
-                    </button>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="flex-1 flex flex-col">
-                      <p className="text-xl mb-2">Question: </p>
-                      <div className="h-full">
-                        <textarea 
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.question}
-                          onChange={(e) => setCurrentQuiz(prev => {
-                            let qtns = prev.questions;
-                            for (let i = 0; i < qtns.length; i++) {
-                              if (qtns[i].id == question.id) {
-                                qtns[i].question = e.target.value;
-                              }
-                            }
-                            return {...prev, questions: qtns}
-                          })}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xl mb-2">Choices: </p>
-                      <div className="space-y-2">
-                        <input 
-                          type="text"
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.choices[0]}
-                          onChange={(e) => setCurrentQuiz(prev => {
-                            let qtns = prev.questions;
-                            for (let i = 0; i < qtns.length; i++) {
-                              if (qtns[i].id == question.id) {
-                                qtns[i].choices[0] = e.target.value;
-                              }
-                            }
-                            return {...prev, questions: qtns}
-                          })}
-                        />
-                        <input 
-                          type="text"
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.choices[1]}
-                          onChange={(e) => setCurrentQuiz(prev => {
-                            let qtns = prev.questions;
-                            for (let i = 0; i < qtns.length; i++) {
-                              if (qtns[i].id == question.id) {
-                                qtns[i].choices[1] = e.target.value;
-                              }
-                            }
-                            return {...prev, questions: qtns}
-                          })}
-                        />
-                        <input 
-                          type="text"
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.choices[2]}
-                          onChange={(e) => setCurrentQuiz(prev => {
-                            let qtns = prev.questions;
-                            for (let i = 0; i < qtns.length; i++) {
-                              if (qtns[i].id == question.id) {
-                                qtns[i].choices[2] = e.target.value;
-                              }
-                            }
-                            return {...prev, questions: qtns}
-                          })}
-                        />
-                        <div>
-                          <p className="text-xl mb-2">Answer: </p>
-                          <input 
-                            type="text" 
-                            className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                            value={question.answer}
-                            onChange={(e) => setCurrentQuiz(prev => {
-                              let qtns = prev.questions;
-                              for (let i = 0; i < qtns.length; i++) {
-                                if (qtns[i].id == question.id) {
-                                  qtns[i].answer = e.target.value;
-                                }
-                              }
-                              return {...prev, questions: qtns}
-                            })}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+      <div className="space-y-12">
+        {/* Multiple Choice Section */}
+        <section>
+          <h1 className="text-2xl font-semibold mb-6">Multiple Choice</h1>
+          <div className="space-y-6">
+            {currentQuiz.questions.filter(q => q.type === "multiple_choice").map(question => (
+              <div key={question.id} className="bg-white border rounded-2xl shadow-sm transition hover:shadow-md px-6 pt-4 pb-6">
+                <div className="flex justify-end">
+                  <button 
+                    onClick={() => removeQuestion(question.id)} 
+                    className="text-red-600 hover:text-red-800 font-bold"
+                  >
+                    ×
+                  </button>
                 </div>
-              ))
-            }
-            <div onClick={addMCQuestion} className="w-full h-20 bg-white/70 text-black/50 flex items-center rounded text-lg px-8 cursor-pointer">
-              Add Multiple Choice Question
-            </div>
-          </div>
-        </div>
-        <div>
-          <h1 className="text-xl mb-4">Identifications</h1>
-          <div className="space-y-2">
-            {
-              currentQuiz.questions.filter(question => question.type === "identification").map(question => (
-                <div key={question.id} className="w-full max-h-80 bg-white border-black borde rounded px-4 pt-2 pb-4">
-                  <div className="flex justify-end">
-                    <button onClick={() => removeQuestion(question.id)}>
-                      X
-                    </button>
+                <div className="flex gap-6">
+                  <div className="flex-1 flex flex-col">
+                    <label className="text-lg font-medium mb-2">Question:</label>
+                    <textarea 
+                      className="w-full text-lg px-4 py-3 border rounded-lg resize-none shadow-sm"
+                      value={question.question}
+                      onChange={(e) => setCurrentQuiz(prev => {
+                        let qtns = prev.questions.map(q => 
+                          q.id === question.id ? { ...q, question: e.target.value } : q
+                        );
+                        return { ...prev, questions: qtns };
+                      })}
+                    />
                   </div>
-                  <div className="flex gap-4">
-                    <div className="flex-1 flex flex-col">
-                      <p className="text-xl mb-2">Question: </p>
-                      <div className="h-full">
-                        <textarea 
-                          className="w-full font-lg py-2 px-4 h-full resize-none border rounded"
-                          value={question.question}
+                  <div className="flex-1">
+                    <label className="text-lg font-medium mb-2 block">Choices:</label>
+                    <div className="space-y-3">
+                      {question.choices.map((choice, idx) => (
+                        <input 
+                          key={idx}
+                          type="text"
+                          className="w-full text-lg px-4 py-2 border rounded-lg shadow-sm"
+                          value={choice}
                           onChange={(e) => setCurrentQuiz(prev => {
-                            let qtns = prev.questions;
-                            for (let i = 0; i < qtns.length; i++) {
-                              if (qtns[i].id == question.id) {
-                                qtns[i].question = e.target.value;
+                            let qtns = prev.questions.map(q => {
+                              if (q.id === question.id) {
+                                let updatedChoices = [...q.choices];
+                                updatedChoices[idx] = e.target.value;
+                                return { ...q, choices: updatedChoices };
                               }
-                            }
-                            return {...prev, questions:qtns}
+                              return q;
+                            });
+                            return { ...prev, questions: qtns };
                           })}
                         />
-                      </div>
+                      ))}
                     </div>
-                    <div className="flex-1">
-                      <p className="text-xl mb-2">Answer: </p>
+                    <div className="mt-4">
+                      <label className="text-lg font-medium mb-2 block">Answer:</label>
                       <input 
                         type="text" 
-                        className="w-full font-lg py-2 px-4 resize-none border rounded"
+                        className="w-full text-lg px-4 py-2 border rounded-lg shadow-sm"
                         value={question.answer}
                         onChange={(e) => setCurrentQuiz(prev => {
-                          let qtns = prev.questions;
-                          for (let i = 0; i < qtns.length; i++) {
-                            if (qtns[i].id == question.id) {
-                              qtns[i].answer = e.target.value;
-                            }
-                          }
-                          return {...prev, questions:qtns}
+                          let qtns = prev.questions.map(q => 
+                            q.id === question.id ? { ...q, answer: e.target.value } : q
+                          );
+                          return { ...prev, questions: qtns };
                         })}
                       />
                     </div>
                   </div>
                 </div>
-              ))
-            }
-            <div onClick={addIDQuestion} className="w-full h-20 bg-white/70 text-black/50 flex items-center rounded text-lg px-8 cursor-pointer">
-              Add Identification Question
+              </div>
+            ))}
+            <div 
+              onClick={addMCQuestion} 
+              className="w-full h-16 bg-white text-gray-500 border rounded-2xl flex items-center justify-center text-lg cursor-pointer hover:bg-gray-50"
+            >
+              + Add Multiple Choice Question
             </div>
-          </div>    
-        </div>
+          </div>
+        </section>
+
+        {/* Identification Section */}
+        <section>
+          <h1 className="text-2xl font-semibold mb-6">Identifications</h1>
+          <div className="space-y-6">
+            {currentQuiz.questions.filter(q => q.type === "identification").map(question => (
+              <div key={question.id} className="bg-white border rounded-2xl shadow-sm transition hover:shadow-md px-6 pt-4 pb-6">
+                <div className="flex justify-end">
+                  <button 
+                    onClick={() => removeQuestion(question.id)} 
+                    className="text-red-600 hover:text-red-800 font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="flex gap-6">
+                  <div className="flex-1 flex flex-col">
+                    <label className="text-lg font-medium mb-2">Question:</label>
+                    <textarea 
+                      className="w-full text-lg px-4 py-3 border rounded-lg resize-none shadow-sm"
+                      value={question.question}
+                      onChange={(e) => setCurrentQuiz(prev => {
+                        let qtns = prev.questions.map(q => 
+                          q.id === question.id ? { ...q, question: e.target.value } : q
+                        );
+                        return { ...prev, questions: qtns };
+                      })}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-lg font-medium mb-2">Answer:</label>
+                    <input 
+                      type="text" 
+                      className="w-full text-lg px-4 py-2 border rounded-lg shadow-sm"
+                      value={question.answer}
+                      onChange={(e) => setCurrentQuiz(prev => {
+                        let qtns = prev.questions.map(q => 
+                          q.id === question.id ? { ...q, answer: e.target.value } : q
+                        );
+                        return { ...prev, questions: qtns };
+                      })}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div 
+              onClick={addIDQuestion} 
+              className="w-full h-16 bg-white text-gray-500 border rounded-2xl flex items-center justify-center text-lg cursor-pointer hover:bg-gray-50"
+            >
+              + Add Identification Question
+            </div>
+          </div>
+        </section>
       </div>
 
-      <div className="mt-8 flex justify-end">
+      <div className="mt-10 flex justify-end">
         <ButtonLarge onClick={updateQuiz}>Update Quiz</ButtonLarge>
       </div>
     </>
+
   )
 }

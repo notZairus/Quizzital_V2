@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 import { QuizContext } from "../../contexts/QuizContext";
 import ButtonLarge from '../../Components/ButtonLarge';
+import { FaClipboardList, FaQuestionCircle } from 'react-icons/fa';
 
 
 
@@ -12,54 +13,74 @@ export default function Quizzes() {
   const { currentUser } = useContext(AuthContext);
   const { quizzes, setQuizzes } = useContext(QuizContext);
 
-  console.log('quizzes: ');
-  console.log(quizzes);
+  console.log('quizzes: ', quizzes);
+
 
   function quizJsx(quiz) {
-    let types = [];
-    let questions = quiz.questions;
+    // Create a Set to ensure unique types only
+    const types = new Set();
+    const questions = quiz.questions;
 
     questions.forEach(question => {
-      if (!types.includes(question.type)) {
-        types.push(question.type);
-      }
+      const questionType = question.type === "identification" ? "IDQ" : "MCQ";
+      types.add(questionType);
     });
 
     return (
       <div 
         key={quiz.id}
-        className="w-full h-20 bg-white rounded border flex justify-between items-center px-8 cursor-pointer"
+        className="w-full bg-gradient-to-r from-BackgroundColor_Darker to-BackgroundColor_Darkest rounded-xl p-6 cursor-pointer transition-all transform hover:scale-105 hover:shadow-xl flex flex-col justify-between gap-6"
         onClick={() => navigate(`/questionnaire/${quiz.id}`)}
       >
-        <p><span className="text-gray-400">ID:</span> <span className="font-semibold text-lg">{quiz.id}</span></p>
-        <p><span className="text-gray-400">Name:</span> <span className="font-semibold text-lg">{quiz.name}</span></p>
-        <p><span className="text-gray-400">Type/s: </span>
-          {
-            types.map(type => <span key={type} className="font-semibold text-lg">{type}, </span>)
-          }
-        </p>
-        <p><span className="text-gray-400">No. of items:</span> <span className="font-semibold text-lg">{quiz.number_of_questions}</span></p>
+        <div className="text-white flex items-center justify-between gap-3">
+          <h2 className="text-xl font-bold">{quiz.name}</h2>
+          <div className="bg-white text-gray-700 py-1 px-4 rounded-full text-sm font-semibold">
+            ID: {quiz.id}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 text-white">
+          <div className="flex items-center gap-2">
+            {Array.from(types).map((type, index) => (
+              <div key={type} className="flex items-center gap-1">
+                {type === "IDQ" ? (
+                  <FaQuestionCircle className="text-2xl" />
+                ) : (
+                  <FaClipboardList className="text-2xl" />
+                )}
+                <span className="font-semibold">{type}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-white">
+          <span className="text-lg font-semibold">No. of items:</span>
+          <span className="text-xl">{quiz.number_of_questions}</span>
+        </div>
       </div>   
-    )
+    );
   }
+
+  
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
-        <Heading1>Questionnaire</Heading1>
-        { currentUser.role == 'professor' && 
+      <div className="flex items-center justify-between mb-6">
+        <Heading1 className="text-2xl md:text-3xl font-semibold">Questionnaire</Heading1>
+        {currentUser.role === 'professor' && (
           <ButtonLarge 
             onClick={() => navigate('/questionnaire/create')}
+            className="px-6 py-3 text-sm md:text-base"
           >
             Create
-          </ButtonLarge> 
-        }
+          </ButtonLarge>
+        )}
       </div>
-      <div className="space-y-4">
-      {
-        quizzes.map(quiz => quizJsx(quiz))
-      }
-      </div> 
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {quizzes.map(quiz => quizJsx(quiz))}
+      </div>
     </>
-  )
+  );
 }

@@ -4,6 +4,7 @@ import { useContext } from "react";
 import { AuthContext } from "./contexts/AuthContext";
 import { ClassroomContext } from "./contexts/ClassroomContext";
 import { QuizContext } from "./contexts/QuizContext";
+import Swal from "sweetalert2";
 
 
 import burger_icon from './assets/icons/burger-icon.svg';
@@ -25,19 +26,44 @@ export default function Layout() {
   const { logout, currentUser } = useContext(AuthContext);
   const { insertClassroom } = useContext(ClassroomContext);
   const { insertQuiz } = useContext(QuizContext);
-  const [openUserMenu, setOpenUserMenu] = useState(false);
   
 
   function handleLogout() {
-    const clearData = () => {
-      localStorage.clear();
-      insertClassroom([]);
-      insertQuiz([]);
-    };
+    
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You will be logged out.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, logout'
+    }).then((result) => {
+      if (result.isConfirmed) {
 
-    clearData();
-    logout();
-    navigate('/login')
+        const clearData = () => {
+          localStorage.clear();
+          insertClassroom([]);
+          insertQuiz([]);
+        };
+    
+        clearData();
+        logout();
+
+        Swal.fire({
+          title: 'Logged out!',
+          text: 'You have been successfully logged out.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+  
+        // Example redirect after a short delay
+        setTimeout(() => {
+          navigate('/login')
+        }, 1500);
+      }
+    });
   }
 
   return (
@@ -56,22 +82,8 @@ export default function Layout() {
           <div 
             className="h-full relative flex gap-12 items-center"
           >
-            <div className="bg-BackgroundColor_Darker text-white px-4 py-1 rounded-full shadow-md">
+            <div className="bg-BackgroundColor_Darker text-white px-4 py-2 rounded-full shadow-md text-xl">
                 {currentUser.role === 'student' ? 'Student' : 'Professor'}
-            </div>
-
-            <div 
-              className="h-full aspect-square rounded-full p-[3px] bg-gray-200 cursor-pointer"
-              onClick={() => setOpenUserMenu(!openUserMenu)}
-            >
-              <img src={!currentUser.profile_picture ? "https://muslimaid-2022.storage.googleapis.com/upload/img_cache/file-34105-0ab2275211d0f9a6ddb85dd13b2b0515.jpeg" : currentUser.profile_picture} alt="" className="h-full rounded-full"/>
-            </div>
-            
-
-            <div className={`${openUserMenu ? "scale-y-100" : "scale-y-0"} gap-2 origin-top w-[200px] p-1 transition-all duration-300 text-2xl overflow-hidden absolute bg-white border rounded right-0 -bottom-[50px] flex flex-col`}>
-              <div  onClick={handleLogout} className="flex-1 flex justify-center text-lg items-center hover:bg-black/5 transition-all duration-300">
-                Logout
-              </div>
             </div>
 
           </div>
@@ -119,18 +131,42 @@ export default function Layout() {
                   <p className="cursor-pointer">Account Details</p>
                 </div>
               </div>
-
-              
-              
             </nav>
             <div className="flex justify-center items-center px-4">
-              //bottom of sidebar
+              <div className="w-full bg-BackgroundColor_Darker h-32 rounded shadow p-4 flex flex-col gap-4 transition duration-300 hover:shadow-lg hover:scale-[1.01]">
+                <div className="flex items-center gap-5 w-full text-white text-2xl">
+                  <div 
+                    className="h-12 aspect-square rounded-full p-[3px] bg-gray-200 cursor-pointer hover:ring-2 hover:ring-white transition duration-200"
+                    onClick={() => navigate('/my-account')}
+                  >
+                    <img
+                      src={
+                        !currentUser.profile_picture
+                          ? "https://muslimaid-2022.storage.googleapis.com/upload/img_cache/file-34105-0ab2275211d0f9a6ddb85dd13b2b0515.jpeg"
+                          : currentUser.profile_picture
+                      }
+                      alt=""
+                      className="h-full rounded-full"
+                    />
+                  </div>
+                  <p className="max-h-8 max-w-48 truncate">{currentUser.first_name} {currentUser.last_name}</p>
+                </div>
+                <div className="flex-1">
+                  <button
+                    onClick={handleLogout}
+                    className="bg-white w-full h-full rounded-md text-black hover:bg-gray-200 transition duration-200"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-  
+
           <div className="flex-1 pt-28 px-16 pb-12">
             <Outlet />
           </div>
+
         </div>
 
       </div>

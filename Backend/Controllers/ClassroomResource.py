@@ -81,3 +81,17 @@ class ClassroomResource(Resource):
       return jsonify({
         'message': e.errors()
       })
+    
+  def delete(self):
+    data = request.get_json()
+
+    if not data['classroom_id']:
+      return jsonify({'message': 'missing classroom id'})
+    
+    classroom = Classroom.query.get(data['classroom_id'])
+
+    print(classroom)
+    db.session.delete(classroom)
+    db.session.commit()
+
+    return jsonify({"message": "successful!"})

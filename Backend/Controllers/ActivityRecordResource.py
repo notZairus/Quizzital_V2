@@ -23,6 +23,51 @@ class delete_activity_record_validator(BaseModel):
   
 
 class ActivityRecordResource(Resource):
+  def get(self):
+    user_id = request.args.get('user_id')
+    activity_id = request.args.get('activity_id')
+
+    if not user_id:
+      return jsonify({'message': 'missing user_id'})
+    
+    if not activity_id:
+      return jsonify({'message': 'missing activity_id'})
+    
+    activity_record = db.session.execute(text("""
+      SELECT DISTINCT answer.id, question.question, question.answer, answer.student_answer, answer.correct, activity.perfect_score, activity_record.user_score, question.type, question.choices FROM activity_record
+      JOIN activity ON activity.id = activity_record.activity_id
+      JOIN quiz ON quiz.id = activity.quiz_id
+      JOIN question ON question.quiz_id = quiz.id
+      JOIN answer ON answer.question_id = question.id
+      WHERE activity_record.user_id = :user_id AND activity_record.activity_id = :activity_id; 
+    """), {
+      'user_id': user_id,
+      'activity_id': activity_id
+    }).fetchall()
+
+
+    answers = [];
+
+    for i in range(len(activity_record)):
+      answers.append({
+        'id': activity_record[i][0],
+        'question': activity_record[i][1],
+        'type': activity_record[i][7],
+        'choices': activity_record[i][8],
+        'correct_answer': activity_record[i][2],
+        'student_answer': activity_record[i][3],
+        'correct': False if activity_record[i][4] == 0 else True,
+      });
+    
+  
+    return jsonify({
+      'perfect_score': activity_record[i][5],
+      'user_score': activity_record[i][6],
+      'answers': answers,
+    })
+
+
+
   def post(self):
     try:
       data = request.get_json()
