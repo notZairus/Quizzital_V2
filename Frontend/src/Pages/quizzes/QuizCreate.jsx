@@ -217,6 +217,7 @@ export default function QuizCreate() {
         model: "gemini-2.0-flash" ,
         systemInstruction: `
             You are an instructor, extract ${question_count} an equal number of multiple choice and identification questions with answer out of the text that will be provided by the user. 
+            The answers of the identification questions should be no more than 2 words to ensure the checking accuracy.
             if the question type is multiplications, your response should be in a JSON with a structure of 
               [{question: "the question", choices: ["choice a", "choice b", "choice c"], answer: "the answer", type: "multiple_choice"}] //IMPORTANT NOTE: the answer should not be included in the choices should pnly be an array of wrong answers
             if the question type is identification, your response should be in a JSON with a structure of 

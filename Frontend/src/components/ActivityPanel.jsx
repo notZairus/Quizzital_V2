@@ -139,8 +139,8 @@ export default function ActivityPanel({ show, setShow, classroom_id }) {
             <div>
               <label className="text-lg font-medium mb-1 block">Grade</label>
               <select
-                value={newActivity.score}
-                onChange={(e) => setNewActivity(prev => ({ ...prev, score: e.target.value }))}
+                value={newActivity.perfect_score}
+                onChange={(e) => setNewActivity(prev => ({ ...prev, perfect_score: e.target.value }))}
                 className="w-full px-4 py-3 rounded-lg border text-lg focus:outline-none"
               >
                 {[100, 50, 20, 10, 5].map(score => (

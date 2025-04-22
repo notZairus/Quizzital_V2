@@ -15,7 +15,7 @@ class Answer(db.Model):
   
 
   def __repr__(self):
-    return f"Answer(id={self.id}, user_id={self.user_id}, question_id={self.question_id})"
+    return f"Answer(id={self.id}, user_id={self.user_id}, question_id={self.question_id}, correct={self.correct})"
   
   def to_json(self):
     return {

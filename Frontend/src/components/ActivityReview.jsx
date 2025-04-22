@@ -12,17 +12,68 @@ export default function ActivityReview() {
   const navigate = useNavigate();
   const parameters = useParams();
   const [activityRecord, setActivityRecord] = useState(null);
-  const { classrooms } = useContext(ClassroomContext);
+  const { refreshClassroom } = useContext(ClassroomContext);
   const { currentUser } = useContext(AuthContext);
+
+
+  function checkAnswer(answer_id) {
+    if (currentUser.role === 'student') return;
+
+    fetch(backendUrl('/answer'), {
+      method: 'PATCH',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        'answer_id': answer_id
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 200) {
+        fetch(backendUrl(`/activity-record?user_id=${parameters.student_id ? parameters.student_id : currentUser.id}&activity_id=${parameters.activity_id ? parameters.activity_id : parameters.id}`))
+        .then(res => res.json())
+        .then(data => {
+          setActivityRecord(data);
+        });
+      }
+    });
+  } 
+  
 
   useEffect(() => {
     ChartJS.register(ArcElement, Tooltip, Legend);
-    fetch(backendUrl(`/activity-record?user_id=${currentUser.id}&activity_id=${parameters.id}`))
+
+    fetch(backendUrl(`/activity-record?user_id=${parameters.student_id ? parameters.student_id : currentUser.id}&activity_id=${parameters.activity_id ? parameters.activity_id : parameters.id}`))
     .then(res => res.json())
-    .then(data => setActivityRecord(data));
+    .then(data => {
+      setActivityRecord(data)
+    });
   }, [])
 
-  console.log(activityRecord)
+  useEffect(() => {
+    if (!activityRecord) return;
+
+    console.log(activityRecord);
+
+    fetch(backendUrl('/activity-record'), {
+      method: 'PATCH',
+      headers: {
+        'Content-type': 'application/json'
+      }, 
+      body: JSON.stringify({
+        'activity_id': activityRecord.activity_record_id,
+        'new_score': Math.round(activityRecord.answers.filter(q => q.correct).length / activityRecord.answers.length * activityRecord.perfect_score),
+        'new_remarks': Math.round(0.7 * activityRecord.perfect_score) <= Math.round(activityRecord.answers.filter(q => q.correct).length / activityRecord.answers.length * activityRecord.perfect_score) 
+        ? "Passed!"
+        : "Failed!",
+      })
+    })
+
+    refreshClassroom();
+  }, [activityRecord]);
+
+
 
   return (
     <>
@@ -30,7 +81,7 @@ export default function ActivityReview() {
         (
           <>
             <div className="w-full h-screen bg-backgroundColor flex flex-col items-center justify-center">
-              <div className=" bg-white rounded shadow-md py-8 px-10 flex gap-12 w-1/3">
+              <div className=" bg-white rounded shadow-md py-8 px-10 flex gap-12 ">
                 <div>
                   <p className="text-2xl">{`Passing Grade: ${Math.round(activityRecord.answers.length * 0.7 / activityRecord.answers.length * activityRecord.perfect_score)}`}</p>
                   <p className="text-2xl">{`Your Grade: ${Math.round(activityRecord.answers.filter(q => q.correct).length / activityRecord.answers.length * activityRecord.perfect_score)}`}</p>
@@ -65,7 +116,8 @@ export default function ActivityReview() {
                   onClick={() => {
                     let classroom_id = localStorage.getItem('currentClassroomId');
                     localStorage.removeItem('currentClassroomId');
-                    navigate(classroom_id ? `/classroom/${classroom_id}` : '/classroom')
+                    refreshClassroom();
+                    navigate(classroom_id ? `/classroom/${classroom_id}` : `/classroom/${parameters.classroom_id}/activity/${parameters.activity_id}/data`)
                   }} 
                   className="text-2xl w-full border px-5 py-4 border-BackgroundColor_Darker bg-white text-BackgroundColor_Darker rounded hover:bg-BackgroundColor_Darker hover:text-white transition-all duration-300">
                   Back to Classroom
@@ -81,12 +133,19 @@ export default function ActivityReview() {
                       <div className="w- bg-white border rounded px-8 pt-4 pb-8">
                         <div className="flex justify-between items-center">
                           <p className="text-2xl">{index+1}. {entry.question}</p>
-                          <div className="h-12 aspect-square">
+                          <div 
+                            onClick={() => checkAnswer(entry.id)} 
+                            className="h-12 aspect-square" 
+                          >
                             {entry.correct 
-                            ? 
-                              (<FaCheck className="w-full h-full text-BackgroundColor_Darker" />)
+                            ?
+                              <div >
+                                <FaCheck className="w-full h-full text-BackgroundColor_Darker" />
+                              </div>
                             :
-                              (<FaXmark className="w-full h-full text-red-500" />)
+                              <div>
+                                <FaXmark  className="w-full h-full text-red-500" />
+                              </div>
                             }
                           </div>
                         </div>
@@ -120,7 +179,10 @@ export default function ActivityReview() {
                       <div className="w-full bg-white border rounded px-8 pt-4 pb-8">
                         <div className="flex justify-between items-center">
                           <p className="text-2xl">{index+11}. {entry.question}</p>
-                          <div className="h-12 aspect-square">
+                          <div 
+                            onClick={() => checkAnswer(entry.id)}
+                            className="h-12 aspect-square"
+                          >
                             {entry.correct 
                             ? 
                               (<FaCheck className="w-full h-full text-BackgroundColor_Darker" />)

@@ -34,22 +34,29 @@ class ActivityRecordResource(Resource):
       return jsonify({'message': 'missing activity_id'})
     
     activity_record = db.session.execute(text("""
-      SELECT DISTINCT answer.id, question.question, question.answer, answer.student_answer, answer.correct, activity.perfect_score, activity_record.user_score, question.type, question.choices FROM activity_record
+      SELECT answer.id, question.question, question.answer, answer.student_answer, answer.correct, activity.perfect_score, activity_record.user_score, question.type, question.choices, activity_record.id, activity_record.remarks FROM activity_record
       JOIN activity ON activity.id = activity_record.activity_id
       JOIN quiz ON quiz.id = activity.quiz_id
       JOIN question ON question.quiz_id = quiz.id
-      JOIN answer ON answer.question_id = question.id
-      WHERE activity_record.user_id = :user_id AND activity_record.activity_id = :activity_id; 
+      JOIN answer ON answer.question_id = question.id AND answer.user_id = activity_record.user_id AND answer.activity_id = activity_record.activity_id
+      WHERE answer.user_id = :user_id AND answer.activity_id = :activity_id; 
     """), {
       'user_id': user_id,
       'activity_id': activity_id
     }).fetchall()
 
 
-    answers = [];
+    data_to_be_sent = {
+      'activity_record_id': None,
+      'perfect_score': None,
+      'user_score': None,
+      'remarks': None,
+      'answers': [],
+    }
+
 
     for i in range(len(activity_record)):
-      answers.append({
+      data_to_be_sent['answers'].append({
         'id': activity_record[i][0],
         'question': activity_record[i][1],
         'type': activity_record[i][7],
@@ -59,14 +66,14 @@ class ActivityRecordResource(Resource):
         'correct': False if activity_record[i][4] == 0 else True,
       });
     
+      if len(activity_record) - 1 == i:
+        data_to_be_sent['activity_record_id'] = activity_record[i][9]
+        data_to_be_sent['perfect_score'] = activity_record[i][5]
+        data_to_be_sent['user_score'] = activity_record[i][6]
+        data_to_be_sent['remarks'] = activity_record[i][10]
+    
   
-    return jsonify({
-      'perfect_score': activity_record[i][5],
-      'user_score': activity_record[i][6],
-      'answers': answers,
-    })
-
-
+    return jsonify(data_to_be_sent)
 
   def post(self):
     try:
@@ -101,3 +108,17 @@ class ActivityRecordResource(Resource):
       return jsonify({'message': 'successful!'})
     except ValidationError as e:
       abort(404, message=e.errors())
+
+  def patch(self):
+    data = request.get_json()
+
+    record = ActivityRecord.query.get(data['activity_id'])
+    record.user_score = data['new_score']
+    record.remarks = data['new_remarks']
+
+    db.session.commit();
+
+    return jsonify({
+      'message': 'successful!',
+      'status': 200
+    })

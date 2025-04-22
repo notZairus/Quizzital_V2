@@ -458,12 +458,14 @@ export default function ClassroomShow() {
           </div>
         </Heading1>
 
-        <button 
-          className="bg-red-500 hover:bg-red-600 transition text-lg px-6 py-3 text-white rounded-2xl font-semibold shadow-md"
-          onClick={deleteClassroom} 
-        >
-          Delete
-        </button>
+        {currentUser.role === "professor" && (
+          <button 
+            className="bg-red-500 hover:bg-red-600 transition text-lg px-6 py-3 text-white rounded-2xl font-semibold shadow-md"
+            onClick={deleteClassroom} 
+          >
+            Delete
+          </button>
+        )}
       </div>
 
 

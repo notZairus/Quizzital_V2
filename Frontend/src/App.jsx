@@ -47,6 +47,8 @@ function App() {
               <Route path="/classroom/:id" element={<ClassroomShow />} />
 
               <Route path="/classroom/:classroom_id/activity/:activity_id/data" element={<ShowActivity />} />
+              <Route path="/classroom/:classroom_id/activity/:activity_id/student/:student_id" element={<ProfessorRoute><ActivityReview /></ProfessorRoute>} />
+
 
               {/* Links of Questionnaire */}
               <Route path='/questionnaire' element={<ProfessorRoute><Quizzes /></ProfessorRoute>}/>

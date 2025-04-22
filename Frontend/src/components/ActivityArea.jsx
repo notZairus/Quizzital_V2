@@ -296,13 +296,15 @@ export default function ActivityArea() {
     )
   }
 
+  console.log(activity);
+  
   return ( 
     <>
       {activityOver && 
         <div className="w-full h-screen bg-backgroundColor flex flex-col items-center justify-center">
           <div className=" bg-white rounded shadow-md py-8 px-10 flex gap-12 w-1/3">
             <div>
-              <p className="text-2xl">{`Passing Grade: ${Math.round(questions.length * 0.7 / questions.length * activity.perfect_score)}`}</p>
+              <p className="text-2xl">{`Passing Grade: ${Math.round(0.7 * activity.perfect_score)}`}</p>
               <p className="text-2xl">{`Your Grade: ${Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score)}`}</p>
 
               <p className="text-6xl font-thin mt-12">
@@ -406,14 +408,6 @@ export default function ActivityArea() {
             }
 
             <div className="mt-12 flex justify-between items-center">
-              {!reviewActivity && <button onClick={() => setActivityOver(true)} className="bg-BackgroundColor_Darker text-white/70 hover:text-white text-xl px-6 py-3 rounded-full  transition-all duration-300">
-                Submit Quiz
-              </button>}
-
-              <div>
-                {/* use for distancing buttons */}
-              </div>
-
               <div className="space-x-2">
                 <button onClick={goPreviousQuestion} className="bg-BackgroundColor text-black/50 text-lg px-4 py-2 rounded-full hover:bg-black/10 hover:text-black transition-all duration-300">
                   Previous
@@ -421,8 +415,11 @@ export default function ActivityArea() {
                 <button onClick={goNextQuestion} className="bg-BackgroundColor text-black/50 text-lg px-4 py-2 rounded-full hover:bg-black/10 hover:text-black transition-all duration-300">
                   Next
                 </button>
-
               </div>
+
+              {!reviewActivity && <button onClick={() => setActivityOver(true)} className="bg-BackgroundColor_Darker text-white/70 hover:text-white text-xl px-6 py-3 rounded-full  transition-all duration-300">
+                Submit Quiz
+              </button>}
             </div>
           </div>
           

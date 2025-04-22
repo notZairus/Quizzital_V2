@@ -177,8 +177,8 @@ export default function ShowActivity() {
       <>
         <div className="w-full h-full">
           <p className="text-center font-semibold text-lg">Students</p>
-          <div className="w-full h-full flex items-start justify-between gap-4 mt-4">
-            <div className="flex-1 h-20">
+          <div className="w-full h-min flex items-start justify-between gap-4 mt-4">
+            <div className="flex-1 h-full">
               <p>Completed: </p>
               <div className="mt-2 w-full space-y-2 max-h-64 overflow-auto cursor-pointer">
                 {finishedStudents.map((s, index) => (
@@ -227,7 +227,16 @@ export default function ShowActivity() {
 
     return (
       <>
-        <p className="text-center font-semibold text-lg">Student's Quiz Result</p>
+        <div className="flex justify-between items-center w-full">
+          <div></div>
+          <p className="text-center font-semibold text-lg">Student's Quiz Result</p>
+          <p 
+            className="text-BackgroundColor_Darkest underline cursor-pointer font-semibold"
+            onClick={() => navigate(`/classroom/${classroom.id}/activity/${studentRecord.activity_id}/student/${studentRecord.user_id}`)}
+          >
+            Quiz Answers
+          </p>
+        </div>
         <div className="w-full h-full grid grid-cols-2 grid-rows-7 gap-y-4 mt-4 px-8">
           <div className="bg-white border-r-2 col-span-1 row-span-3 px-4 py-2 flex flex-col">
             <div className="flex-1 flex flex-col gap-4 justify-center items-center">
@@ -293,6 +302,7 @@ export default function ShowActivity() {
     });
   }
 
+  console.log(activity)
 
   return (
     <>

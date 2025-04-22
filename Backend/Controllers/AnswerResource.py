@@ -29,3 +29,22 @@ class AnswerResource(Resource):
 
     except ValidationError as e:
       abort(404, message=e.errors())
+
+
+  def patch(self):
+    try:
+      data = request.get_json()
+      print(data)
+      answer = Answer.query.get(data['answer_id'])
+      answer.correct = not answer.correct
+      db.session.commit()
+
+      return jsonify({
+        "message": "successful!",
+        "status": 200
+      })
+
+    except Exception as e:
+      return jsonify({
+        "message": "unknown error",
+      })
