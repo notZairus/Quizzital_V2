@@ -525,6 +525,7 @@ export default function ClassroomShow() {
                   onClick={() => openActivity(activity.id)}
                   className="w-full bg-gradient-to-r from-BackgroundColor_Darker to-BackgroundColor_Darkest rounded-xl p-4 cursor-pointer transition-all hover:shadow-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
                 >
+                  {console.log(activity)}
                   <div className="flex-1 flex justify-between items-center">
                     <div className="text-white font-semibold text-xl w-56 truncate">{activity.name}</div>
                   
@@ -538,7 +539,7 @@ export default function ClassroomShow() {
                   
                     <div className="text-sm text-gray-200 text-right sm:text-left">
                       <p><span className="text-gray-300">Open:</span> {activity.open_at}</p>
-                      <p><span className="text-gray-300">Close:</span> {activity.close_at}</p>
+                      <p><span className="text-gray-300">Close:</span> {activity.close_at ? activity.close_at : 'No Closing Date'}</p>
                       {activity.timer > 0 && (
                         <p><span className="text-gray-300">Timer:</span> {formatSeconds(activity.timer)} mins</p>
                       )}

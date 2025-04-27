@@ -5,6 +5,7 @@ from typing import Optional
 from datetime import datetime
 from Models.answer_model import Answer
 from configs import db
+from sqlalchemy import text
 
 
 class post_answer_validator(BaseModel):
@@ -47,4 +48,36 @@ class AnswerResource(Resource):
     except Exception as e:
       return jsonify({
         "message": "unknown error",
+      })
+
+  def delete(self):
+    try:
+      data = request.get_json()
+      
+      if not data['activity_id']:
+        return jsonify({
+          'message': 'missing activity_id'
+        })
+      
+      if not data['user_id']:
+        return jsonify({
+          'message': 'missing user_id'
+        })
+
+      db.session.execute(text("""
+        DELETE FROM answer WHERE user_id = :user_id AND activity_id = :activity_id;
+      """), {
+        'user_id': data['user_id'],
+        'activity_id': data['activity_id']
+      })
+
+      db.session.commit()
+
+      return jsonify({
+        'message': 'successful!'
+      })
+      
+    except Exception as e:
+      return jsonify({
+        'message': 'error'
       })

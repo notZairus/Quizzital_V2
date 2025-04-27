@@ -5,7 +5,9 @@ import { backendUrl } from "../js/functions";
 import { AuthContext } from "../contexts/AuthContext";
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { FaCheck, FaXmark } from "react-icons/fa6"
+import { FaCheck, FaXmark } from "react-icons/fa6";
+import Heading1 from "./Heading1";
+import Swal from "sweetalert2";
 
 
 export default function ActivityReview() {
@@ -74,12 +76,66 @@ export default function ActivityReview() {
   }, [activityRecord]);
 
 
+  console.log(activityRecord);
+  console.log(parameters)
+
+
+  async function deleteActivityRecord() {
+
+    Swal.fire({
+      title: 'Delete Quiz Record?',
+      text: "This action cannot is irreversible!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+      preConfirm: async () => {
+
+        // delete student answer
+        await fetch(backendUrl('/answer'), {
+          method: 'DELETE',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            'user_id': parameters.student_id,
+            'activity_id': parameters.activity_id
+          })
+        })
+
+        // delete the record
+        await fetch(backendUrl('/activity-record'), {
+          method: 'DELETE',
+          headers: {
+            'Content-type' : 'application/json'
+          },
+          body: JSON.stringify({
+            'activity_record_id': activityRecord.activity_record_id
+          })
+        });
+
+        refreshClassroom();
+        navigate(`/classroom/${parameters.classroom_id}/activity/${parameters.activity_id}/data`);
+      }
+    })
+  } 
 
   return (
     <>
       {activityRecord && 
         (
           <>
+            {currentUser.role === "professor" && <div className="flex justify-end"> 
+              <button 
+                className="bg-red-500 hover:bg-red-600 transition text-lg px-6 py-3 text-white rounded-2xl font-semibold shadow-md"
+                onClick={deleteActivityRecord}
+              >
+                Delete
+              </button>
+            </div>}
             <div className="w-full h-screen bg-backgroundColor flex flex-col items-center justify-center">
               <div className=" bg-white rounded shadow-md py-8 px-10 flex gap-12 ">
                 <div>

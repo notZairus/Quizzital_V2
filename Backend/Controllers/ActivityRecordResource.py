@@ -91,21 +91,19 @@ class ActivityRecordResource(Resource):
   def delete(self):
     try:
       data = request.get_json()
-      validated_data = delete_activity_record_validator(**data).model_dump()
-      print(validated_data)
 
-      db.session.execute(text("""
-        DELETE activity_record 
-        FROM activity_record 
-        JOIN activity ON activity_record.activity_id = activity.id
-        WHERE activity_record.user_id = :u_id AND activity.classroom_id = :c_id
-      """), {
-        "u_id": validated_data['user_id'], 
-        "c_id": validated_data['classroom_id']
-      })
+
+      if not (data['activity_record_id']):
+        return jsonify({
+          'message': 'missing activity_record_id'
+        })
+      
+      record = ActivityRecord.query.get(data['activity_record_id'])
+      db.session.delete(record)
       db.session.commit()
-
+    
       return jsonify({'message': 'successful!'})
+
     except ValidationError as e:
       abort(404, message=e.errors())
 

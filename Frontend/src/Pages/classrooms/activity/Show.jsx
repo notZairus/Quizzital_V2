@@ -160,7 +160,7 @@ export default function ShowActivity() {
       <>
         <p className="text-center font-semibold text-lg">Passing Rate</p>
         <div className="w-full h-full flex items-center justify-center">
-          <p className="text-8xl text-BackgroundColor_Darker">{passedCount / recordCount * 100}%</p>
+          <p className="text-8xl text-BackgroundColor_Darker">{Math.round(passedCount / recordCount * 100)}%</p>
         </div>
       </>
     )

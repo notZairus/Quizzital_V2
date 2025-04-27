@@ -381,7 +381,7 @@ export default function Show() {
       </div>
 
       <div className="mt-10 flex justify-end">
-        <ButtonLarge onClick={updateQuiz}>Update Quiz</ButtonLarge>
+        <ButtonLarge onClick={updateQuiz}>Update Questionnaire</ButtonLarge>
       </div>
     </>
 

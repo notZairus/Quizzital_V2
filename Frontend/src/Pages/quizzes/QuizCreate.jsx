@@ -199,8 +199,8 @@ export default function QuizCreate() {
           let questionString = result.slice(result.indexOf('['), result.lastIndexOf(']') + 1)
           let questions = JSON.parse(questionString);
 
-          setMultipleChoiceQuestions([...multipleChoiceQuestions, ...questions.filter(q => q.type === "multiple_choice")])
-          setIdenficationQuestions([...idenficationQuestions, ...questions.filter(q => q.type === "identification")])
+          setMultipleChoiceQuestions([...questions.filter(q => q.type === "multiple_choice")])
+          setIdenficationQuestions([...questions.filter(q => q.type === "identification")])
           
         } catch(error) {
           Swal.fire({
@@ -395,7 +395,7 @@ export default function QuizCreate() {
       </div>
 
       <div className="mt-12 flex justify-end">
-        <ButtonLarge onClick={createQuiz}>Create Quiz</ButtonLarge>
+        <ButtonLarge onClick={createQuiz}>Create Questionnaire</ButtonLarge>
       </div>
     </>
 

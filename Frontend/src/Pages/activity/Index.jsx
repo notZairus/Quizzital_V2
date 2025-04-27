@@ -82,7 +82,7 @@ export default function Activities() {
       return;
     }
 
-    if (timeNow.getTime() > closeTime.getTime()) {
+    if (timeNow.getTime() > closeTime.getTime() && currentActivity.close_at) {
       Swal.fire({
         icon: 'warning',
         title: 'Activity Closed',
@@ -126,14 +126,11 @@ export default function Activities() {
                   {
                     c.activities.map(activity => {
 
-
-
                       let students_who_already_answered = activity.records.map(r => r.user_id);
 
                       if (students_who_already_answered.includes(currentUser.id)) return null;
                     
                       if (!activity.quiz) return null
-
                   
                       return (
                         <div
@@ -152,10 +149,10 @@ export default function Activities() {
                           </div>
                         
                           <div className="text-sm text-gray-300 text-right sm:text-left">
-                            <p><span className="text-gray-400">Open:</span> {activity.open_at}</p>
-                            <p><span className="text-gray-400">Close:</span> {activity.close_at}</p>
+                            <p><span className="text-gray-300/80">Open:</span> {activity.open_at}</p>
+                            <p><span className="text-gray-300/80">Close:</span> {activity.close_at ? activity.close_at : 'No Closing Date'}</p>
                             {activity.timer > 0 && (
-                              <p><span className="text-gray-400">Timer:</span> {formatSeconds(activity.timer)} mins</p>
+                              <p><span className="text-gray-300/80">Timer:</span> {formatSeconds(activity.timer)} mins</p>
                             )}
                           </div>
                         </div>
@@ -163,7 +160,6 @@ export default function Activities() {
                     })
                   }
                     
-
                   </div>
                 </div>
               </>
