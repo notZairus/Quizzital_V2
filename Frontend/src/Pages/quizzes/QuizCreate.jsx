@@ -346,7 +346,7 @@ export default function QuizCreate() {
             {idenficationQuestions.map((question, index) => (
               <div key={index} className="rounded-lg border border-gray-300 p-6 bg-white shadow-sm hover:shadow-md transition space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-medium">Question {index + 1}</span>
+                  <span className="text-lg font-medium">Question {index + 11}</span>
                   <button
                     onClick={() => setIdenficationQuestions(prev => prev.filter((_, i) => i !== index))}
                     className="text-red-500 hover:underline"

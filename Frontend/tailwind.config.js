@@ -12,7 +12,16 @@ export default {
         BackgroundColor_Darkest: '#0B8CA5',   // darker version of #0EA2BE
         White: '#FAFAFA',
         TextColor: '#0C0C10',
-      }
+      },
+      animation: {
+        float: "float 3s ease-in-out infinite",
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+      },
     },
   },
   plugins: [],

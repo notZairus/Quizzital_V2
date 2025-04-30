@@ -85,6 +85,10 @@ export default function AccountSettings() {
     
     const data = await response.json();
 
+    Swal.fire({
+      title: 'Display Picture Updated!'
+    })
+
     setPersonalInfo({...personalInfo, dp:data.url})
   }
 

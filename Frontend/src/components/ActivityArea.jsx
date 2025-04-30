@@ -196,6 +196,50 @@ export default function ActivityArea() {
           backdrop: 'white',
           
         })
+
+        if (tabChangeCount >= 5) {
+          const insertInDB = async () => {
+            let data = {
+              'user_id': currentUser.id,
+              'activity_id': activity.id,
+              'remarks': Math.round(questions.length * 0.7 / questions.length * activity.perfect_score) <= Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score) 
+                        ? "Passed!"
+                        : "Failed!",
+              'user_score': Math.round(questions.filter(q => q.correct).length / questions.length * activity.perfect_score),
+              'perfect_score': activity.perfect_score
+            }
+      
+            await fetch(backendUrl('/activity-record'), {
+              method: 'POST',
+              headers: {
+                'Content-type': 'application/json'
+              },
+              body: JSON.stringify(data)
+            })
+      
+            questions.forEach(async (q) => {
+              await fetch(backendUrl('/answer'), {
+                method: 'POST',
+                headers: {
+                  'Content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                  'user_id': currentUser.id,
+                  'activity_id': activity.id,
+                  'question_id': q.id,
+                  'correct': q.correct,
+                  'student_answer': q._answer
+                })
+              })
+            }) 
+      
+            Toast('success', 'Activity Recorded Successfully!')
+            refreshClassroom();
+            navigate(`/classroom/${currentClassroom.id}`)
+          }
+      
+          insertInDB();
+        }
       }
     }
 

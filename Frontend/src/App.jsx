@@ -5,9 +5,10 @@ import { AuthContext } from './contexts/AuthContext.jsx';
 import ProfessorRoute from './Components/ProfessorRoute.jsx';
 
 
+const LandingPage = lazy(() => import('./Pages/Landing.jsx'));
+
 const Classrooms = lazy(() => import('./Pages/classrooms/Index.jsx'));
 const ClassroomShow = lazy(() => import('./Pages/classrooms/Show.jsx'));
-
 
 const ActivityArea = lazy(() => import('./Components/ActivityArea.jsx'))
 const ShowActivity = lazy(() => import('./Pages/classrooms/activity/Show.jsx'));
@@ -39,8 +40,12 @@ function App() {
       <BrowserRouter> 
         <Suspense>
           <Routes key={location.pathname}>
+
+            
+            <Route path="/" element={<LandingPage />}/>
             
             <Route path="/" element={<AuthenticatedRoute><Layout /></AuthenticatedRoute>}>
+
             
               {/* Links of Classroom */}
               <Route path="/classroom" element={<Classrooms />} />

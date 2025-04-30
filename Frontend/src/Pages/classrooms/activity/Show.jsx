@@ -264,7 +264,7 @@ export default function ShowActivity() {
   function deleteActivity() {
     Swal.fire({
       title: 'Are you sure?',
-      text: "This activity will be permanently deleted.",
+      text: "This quiz will be permanently deleted.",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',

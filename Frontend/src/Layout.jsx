@@ -77,7 +77,7 @@ export default function Layout() {
           </div>
           <div className="cursor-pointer h-full flex justify-center items-center" onClick={() => navigate('/classroom')}>
             <img src={logo} alt="logo" className="h-16"/>
-            <h1 className="text-BackgroundColor_Darker text-4xl font-bold">Quizzital</h1>
+            {/* <h1 className="text-BackgroundColor_Darker text-4xl font-bold">Quizzital</h1> */}
           </div>
           <div 
             className="h-full relative flex gap-12 items-center"
